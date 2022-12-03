@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Render extends Model
+class RenderDetails extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,6 +12,6 @@ class Render extends Model
      * @var array
      */
     protected $fillable = [
-        'submitted_by_user_id','status'
+        'allocated_to_user_id','status'
     ];
 }

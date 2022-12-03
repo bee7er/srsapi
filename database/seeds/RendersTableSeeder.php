@@ -14,14 +14,10 @@ class RendersTableSeeder extends Seeder
     {
         DB::table('renders')->delete();
 
-        Render::create(['user_id' => 1,
-            'description' => 'Render of my first key frame',
-            'c4d_action' => 'Some render request string',
+        Render::create(['submitted_by_user_id' => 1,
             'status' => 'open']);
 
-        Render::create(['user_id' => 2,
-            'description' => 'Render of my interesting key frame',
-            'c4d_action' => 'Another render request string',
+        Render::create(['submitted_by_user_id' => 2,
             'status' => 'open']);
     }
 }

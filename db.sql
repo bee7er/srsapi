@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.40, for Linux (x86_64)
 --
--- Host: localhost    Database: trendman
+-- Host: localhost    Database: srs
 -- ------------------------------------------------------
 -- Server version	5.7.40-0ubuntu0.18.04.1
 
@@ -34,7 +34,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES ('2022_11_19_000000_create_users_table',1),('2022_11_19_100000_create_password_resets_table',1),('2022_11_19_200000_create_renders_table',1),('2022_11_19_300000_renders_add_rendered_at',1);
+INSERT INTO `migrations` VALUES ('2022_11_19_000000_create_users_table',1),('2022_11_19_100000_create_password_resets_table',1),('2022_11_19_200000_create_renders_table',1),('2022_11_19_300000_create_render_details_table',2);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -64,6 +64,34 @@ LOCK TABLES `password_resets` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `render_details`
+--
+
+DROP TABLE IF EXISTS `render_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `render_details` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `allocated_to_user_id` int(10) unsigned NOT NULL,
+  `status` enum('ready','allocated','done') COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  KEY `render_details_allocated_to_user_id_index` (`allocated_to_user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `render_details`
+--
+
+LOCK TABLES `render_details` WRITE;
+/*!40000 ALTER TABLE `render_details` DISABLE KEYS */;
+INSERT INTO `render_details` VALUES (1,1,'ready','2022-12-03 15:36:53','2022-12-03 15:36:53'),(2,2,'ready','2022-12-03 15:36:53','2022-12-03 15:36:53');
+/*!40000 ALTER TABLE `render_details` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `renders`
 --
 
@@ -72,16 +100,14 @@ DROP TABLE IF EXISTS `renders`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `renders` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(10) unsigned NOT NULL,
-  `description` text COLLATE utf8_unicode_ci,
-  `c4d_action` text COLLATE utf8_unicode_ci NOT NULL,
+  `submitted_by_user_id` int(10) unsigned NOT NULL,
   `status` enum('open','ready','rendering','complete') COLLATE utf8_unicode_ci NOT NULL,
+  `completed_at` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `rendered_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `renders_user_id_index` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  KEY `renders_submitted_by_user_id_index` (`submitted_by_user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +116,7 @@ CREATE TABLE `renders` (
 
 LOCK TABLES `renders` WRITE;
 /*!40000 ALTER TABLE `renders` DISABLE KEYS */;
-INSERT INTO `renders` VALUES (1,1,'Render of my first key frame','Some render request string','open','2022-11-18 18:14:32','2022-11-18 18:14:32',NULL),(2,2,'Render of my interesting key frame','Another render request string','open','2022-11-18 18:14:32','2022-11-18 18:14:32',NULL);
+INSERT INTO `renders` VALUES (5,1,'open',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53'),(6,2,'open',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53');
 /*!40000 ALTER TABLE `renders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -106,14 +132,16 @@ CREATE TABLE `users` (
   `first_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `surname` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `ip_address` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `role` enum('admin','user') COLLATE utf8_unicode_ci NOT NULL,
+  `status` enum('available','unavailable') COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
-  `status` blob NOT NULL,
   `remember_token` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,7 +150,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'brian','etheridge','foo@bar.com','$2y$10$HinJCb3U0/Zp./RlU4HEyOhtefauIkkfE4JmO4Dytl.RK0F8cSySC',_binary '1',NULL,'2022-11-18 18:14:32','2022-11-18 18:14:32'),(2,'barry','fiddlestone','contact_bee@yahoo.com','$2y$10$tQyU6CYI6INVOZL0rt8t3eIEHnd3NLiTg9.mV8a0XhoqAf2fb3Hi6',_binary '1',NULL,'2022-11-18 18:14:32','2022-11-18 18:14:32');
+INSERT INTO `users` VALUES (5,'brian','etheridge','betheridge@gmail.com','','admin','available','$2y$10$8noF7dGS.TVeI3fMlODIq.wC0QDSM1QdS4r6eWNbhvIFSYjUgGB4S',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53'),(6,'barry','fiddlestone','contact_bee@yahoo.com','','admin','available','$2y$10$O8mOeFcfH3hsXsrA1oujwec9LSfuLzva5guwU9cs/V0/8kNKTdOMK',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -135,4 +163,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-01 12:41:28
+-- Dump completed on 2022-12-03 15:37:53

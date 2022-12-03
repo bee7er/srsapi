@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRendersTable extends Migration
+class CreateRenderDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,12 +12,11 @@ class CreateRendersTable extends Migration
      */
     public function up()
     {
-        // Render header records
-        Schema::create('renders', function (Blueprint $table) {
+        // Render detail records
+        Schema::create('render_details', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('submitted_by_user_id')->unsigned()->index();
-            $table->enum('status', array('open','ready','rendering','complete'));
-            $table->dateTime('completed_at')->nullable();
+            $table->integer('allocated_to_user_id')->unsigned()->index();
+            $table->enum('status', array('ready','allocated','done'));
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateRendersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('renders');
+        Schema::drop('render_details');
     }
 }

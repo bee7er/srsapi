@@ -37,12 +37,20 @@ class RendersController extends Controller
     public function render(Request $request)
     {
         try {
+            $message = "Data received OK";
+            $result = 'Error';
+
+            // Do something
+
+            $result = 'OK';
+
             $received = [
                 "overridesettings" => $request->get(self::OVERRIDESETTINGS),
                 "customframerange" => $request->get(self::CUSTOMFRAMERANGE),
                 "from" => $request->get(self::FROM),
                 "to" => $request->get(self::TO),
-                "message" => "Data received OK",
+                "message" => $message,
+                "result" => $result
             ];
 
             return $received;   // Gets converted to json
@@ -61,8 +69,16 @@ class RendersController extends Controller
     public function available(Request $request)
     {
         try {
+            $message = "Available notification received OK";
+            $result = 'Error';
+
+            // Do something
+
+            $result = 'OK';
+
             $received = [
-                "message" => "Available notification received OK",
+                "message" => $message,
+                "result" => $result
             ];
 
             return $received;   // Gets converted to json
@@ -81,8 +97,16 @@ class RendersController extends Controller
     public function rendering(Request $request)
     {
         try {
+            $message = "Rendering notification received OK";
+            $result = 'Error';
+
+            // Do something
+
+            $result = 'OK';
+
             $received = [
-                "message" => "Rendering notification received OK",
+                "message" => $message,
+                "result" => $result
             ];
 
             return $received;   // Gets converted to json
@@ -101,8 +125,16 @@ class RendersController extends Controller
     public function complete(Request $request)
     {
         try {
+            $message = "Complete notification received OK";
+            $result = 'Error';
+
+            // Do something
+
+            $result = 'OK';
+
             $received = [
-                "message" => "Complete notification received OK",
+                "message" => $message,
+                "result" => $result
             ];
 
             return $received;   // Gets converted to json

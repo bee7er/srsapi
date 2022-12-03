@@ -17,14 +17,16 @@ class UserTableSeeder extends Seeder
 
         User::create(['first_name' => 'brian',
             'surname' => 'etheridge',
-            'email' => 'foo@bar.com',
+            'email' => 'betheridge@gmail.com',
             'password' =>  Hash::make('password'),
-            'status' =>  true]);
+            'role' =>  'admin',
+            'status' =>  'available']);
 
         User::create(['first_name' => 'barry',
             'surname' => 'fiddlestone',
             'email' => 'contact_bee@yahoo.com',
             'password' =>  Hash::make('password'),
-            'status' =>  true]);
+            'role' =>  'admin',
+            'status' =>  'available']);
     }
 }
