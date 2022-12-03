@@ -1,0 +1,17 @@
+body {
+  padding-top: 60px; }
+
+body, label, .checkbox label {
+  font-weight: 300; }
+
+#footer {
+  position: absolute;
+  bottom: 0;
+  width: 644px;
+  height: 20px;
+  margin: 0 0 15px 30px; }
+
+.shine {
+  color: #fff !important; }
+
+/*# sourceMappingURL=app.css.map */
