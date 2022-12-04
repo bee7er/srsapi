@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Renders;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Render;
 
@@ -61,34 +62,6 @@ class RendersController extends Controller
     }
 
     /**
-     * Available notification from a slave user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function available(Request $request)
-    {
-        try {
-            $message = "Available notification received OK";
-            $result = 'Error';
-
-            // Do something
-
-            $result = 'OK';
-
-            $received = [
-                "message" => $message,
-                "result" => $result
-            ];
-
-            return $received;   // Gets converted to json
-
-        } catch(\Exception $exception) {
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
-        }
-    }
-
-    /**
      * Rendering notification from a slave user.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -100,6 +73,7 @@ class RendersController extends Controller
             $message = "Rendering notification received OK";
             $result = 'Error';
 
+            Log::info('In rendering for email: ' . $request->get('email'));
             // Do something
 
             $result = 'OK';
@@ -128,6 +102,7 @@ class RendersController extends Controller
             $message = "Complete notification received OK";
             $result = 'Error';
 
+            Log::info('In complete for email: ' . $request->get('email'));
             // Do something
 
             $result = 'OK';

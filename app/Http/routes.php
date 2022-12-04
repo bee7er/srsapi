@@ -48,10 +48,17 @@ Route::post('/api1/register', function (Request $request) {
     );
 });
 
+// Slave user notifying master that they are awake but not available for rendering
+Route::post('/api1/awake', function (Request $request) {
+    return response()->json(
+        (new RegistrationsController)->awake($request)
+    );
+});
+
 // Slave user notifying master that they are not currently rendering
 Route::post('/api1/available', function (Request $request) {
     return response()->json(
-        (new RendersController)->available($request)
+        (new RegistrationsController)->available($request)
     );
 });
 
