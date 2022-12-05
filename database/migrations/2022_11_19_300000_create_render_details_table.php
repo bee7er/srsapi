@@ -15,6 +15,7 @@ class CreateRenderDetailsTable extends Migration
         // Render detail records
         Schema::create('render_details', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('render_id')->unsigned()->index();
             $table->integer('allocated_to_user_id')->unsigned()->index();
             $table->enum('status', array('ready','allocated','done'));
             $table->timestamps();

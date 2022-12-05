@@ -4,8 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RenderDetails extends Model
+class RenderDetail extends Model
 {
+    // Render detail statuses
+    const READY = 'ready';
+    const ALLOCATED = 'allocated';
+    const DONE = 'done';
+
     /**
      * The attributes that are mass assignable.
      *

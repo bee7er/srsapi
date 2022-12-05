@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Render extends Model
 {
+    // Render statuses
+    const OPEN = 'open';    // Not ready yet
+    const READY = 'ready';
+    const RENDERING = 'rendering';
+    const COMPLETE = 'complete';
+
     /**
      * The attributes that are mass assignable.
      *

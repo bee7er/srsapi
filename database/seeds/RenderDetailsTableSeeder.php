@@ -1,6 +1,6 @@
 <?php
 
-use App\RenderDetails;
+use App\RenderDetail;
 use Illuminate\Database\Seeder;
 
 class RenderDetailsTableSeeder extends Seeder
@@ -14,10 +14,10 @@ class RenderDetailsTableSeeder extends Seeder
     {
         DB::table('render_details')->delete();
 
-        RenderDetails::create(['allocated_to_user_id' => 1,
+        RenderDetail::create(['render_id' => 1,'allocated_to_user_id' => 0,
             'status' => 'ready']);
 
-        RenderDetails::create(['allocated_to_user_id' => 2,
+        RenderDetail::create(['render_id' => 2,'allocated_to_user_id' => 0,
             'status' => 'ready']);
     }
 }

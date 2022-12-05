@@ -15,9 +15,9 @@ class RendersTableSeeder extends Seeder
         DB::table('renders')->delete();
 
         Render::create(['submitted_by_user_id' => 1,
-            'status' => 'open']);
+            'status' => 'ready']);
 
         Render::create(['submitted_by_user_id' => 2,
-            'status' => 'open']);
+            'status' => 'ready']);
     }
 }

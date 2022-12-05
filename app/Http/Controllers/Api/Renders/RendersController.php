@@ -3,18 +3,25 @@
 namespace App\Http\Controllers\Api\Renders;
 
 use App\Http\Controllers\Controller;
+use App\Render;
+use App\RenderDetail;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use App\Render;
 
 class RendersController extends Controller
 {
-    const OVERRIDESETTINGS = "OVERRIDESETTINGS";
-    const CUSTOMFRAMERANGE = "CUSTOMFRAMERANGE";
-    const FROM = "FROM";
-    const TO = "TO";
+    // Parameters
+    const EMAIL = "email";
+    const CUSTOMFRAMERANGE = "custom_frame_range";
+    const OVERRIDESETTINGS = "override_settings";
+    const FROM = "from";
+    const TO = "to";
+    const RENDERDETAILID = "render_detail_id";
+    const RENDERID = "render_id";
 
     /**
      * Display a listing of the resource.
@@ -40,16 +47,47 @@ class RendersController extends Controller
         try {
             $message = "Data received OK";
             $result = 'Error';
+            $renderId = 0;
 
-            // Do something
+            // Write header and detail records to db
+            // TODO Check if an outstanding request for the same frames is present?
+            Log::info('In render for email: ' . $request->get(self::EMAIL));
 
-            $result = 'OK';
+            $user = User::where('email', $request->get(self::EMAIL)) -> first();
+            if ($user) {
+                // Create a new Render record
+                $render = new Render();
+                $render->submitted_by_user_id = $user->id;
+                $render->status = Render::OPEN;
+                $render->save();
+                $renderId = $render->id;
+                // Create the detail records
+                $renderDetail = new RenderDetail();
+                $renderDetail->render_id = $render->id;
+                $renderDetail->status = RenderDetail::READY;
+                $renderDetail->save();
+                // Ok, Render is now ready
+                $render->status = Render::READY;
+                $render->save();
+
+                Log::info('Render details: ' . print_r($render, true));
+
+                $result = 'OK';
+
+            } else {
+                // User can only be added by the administrator
+                $message = "Could not find user with email: " . $request->get(self::EMAIL);
+                Log::info('Error: ' . $message);
+                $result = 'Error';
+            }
 
             $received = [
-                "overridesettings" => $request->get(self::OVERRIDESETTINGS),
-                "customframerange" => $request->get(self::CUSTOMFRAMERANGE),
-                "from" => $request->get(self::FROM),
-                "to" => $request->get(self::TO),
+                self::EMAIL => $request->get(self::EMAIL),
+                self::OVERRIDESETTINGS => $request->get(self::OVERRIDESETTINGS),
+                self::CUSTOMFRAMERANGE => $request->get(self::CUSTOMFRAMERANGE),
+                self::FROM => $request->get(self::FROM),
+                self::TO => $request->get(self::TO),
+                self::RENDERID => $renderId,
                 "message" => $message,
                 "result" => $result
             ];
@@ -73,7 +111,7 @@ class RendersController extends Controller
             $message = "Rendering notification received OK";
             $result = 'Error';
 
-            Log::info('In rendering for email: ' . $request->get('email'));
+            Log::info('In rendering for email: ' . $request->get(self::EMAIL));
             // Do something
 
             $result = 'OK';
@@ -102,9 +140,34 @@ class RendersController extends Controller
             $message = "Complete notification received OK";
             $result = 'Error';
 
-            Log::info('In complete for email: ' . $request->get('email'));
-            // Do something
+            Log::info('In complete for email: ' . $request->get(self::EMAIL));
+            Log::info('In complete for render details: ' . $request->get(self::RENDERDETAILID));
+            // Update the detail record to DONE
+            $renderDetailId = $request->get(self::RENDERDETAILID);
+            $renderDetail = RenderDetail::find($renderDetailId);
+            if (!$renderDetail) {
+                throw new \Exception("Could not find render detail record with id '{$renderDetailId}'");
+            }
+            $renderDetail->status = RenderDetail::DONE;
+            $renderDetail->save();
+            // If all details are DONE then the render is COMPLETE
+            $result = DB::table('render_details as rd')
+                ->select('rd.id','rd.status')
+                ->where('rd.render_id', $renderDetail->render_id)
+                ->where('rd.status', '!=', RenderDetail::DONE)
+                ->get();
+            Log::info('Render details: ' . print_r($result, true));
 
+            if (0 >= count($result)) {
+                $render = Render::find($renderDetail->render_id);
+                if (!$render) {
+                    throw new \Exception("Could not find render record with id '{$renderDetail->render_id}'");
+                }
+                $render->status = Render::COMPLETE;
+                $render->completed_at = date('Y-m-d H:i:s');
+                $render->save();
+                Log::info('Render is COMPLETE with id: ' . $renderDetail->render_id);
+            }
             $result = 'OK';
 
             $received = [
@@ -115,65 +178,9 @@ class RendersController extends Controller
             return $received;   // Gets converted to json
 
         } catch(\Exception $exception) {
+            Log::info('Error: ' . $exception->getMessage());
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
         }
     }
 
-
-
-
-
-
-
-    // **************************************
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $render = Render::findOrfail($id);
-
-        return $render; //new RenderResource($render);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        if (!$id) {
-            throw new HttpException(400, "Invalid id");
-        }
-
-        try {
-           $render = Render::find($id);
-           $render->fill($request->validated())->save();
-
-           return $render; //new RenderResource($render);
-
-        } catch(\Exception $exception) {
-           throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $render = Render::findOrfail($id);
-        $render->delete();
-
-        return response()->json(null, 204);
-    }
 }

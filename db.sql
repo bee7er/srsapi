@@ -72,13 +72,15 @@ DROP TABLE IF EXISTS `render_details`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `render_details` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `render_id` int(10) unsigned NOT NULL,
   `allocated_to_user_id` int(10) unsigned NOT NULL,
   `status` enum('ready','allocated','done') COLLATE utf8_unicode_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
+  KEY `render_details_render_id_index` (`render_id`),
   KEY `render_details_allocated_to_user_id_index` (`allocated_to_user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -87,7 +89,7 @@ CREATE TABLE `render_details` (
 
 LOCK TABLES `render_details` WRITE;
 /*!40000 ALTER TABLE `render_details` DISABLE KEYS */;
-INSERT INTO `render_details` VALUES (1,1,'ready','2022-12-03 15:36:53','2022-12-03 15:36:53'),(2,2,'ready','2022-12-03 15:36:53','2022-12-03 15:36:53');
+INSERT INTO `render_details` VALUES (3,9,6,'done','2022-12-05 13:28:00','2022-12-05 13:29:28'),(4,10,6,'done','2022-12-05 13:28:00','2022-12-05 13:29:38');
 /*!40000 ALTER TABLE `render_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -107,7 +109,7 @@ CREATE TABLE `renders` (
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `renders_submitted_by_user_id_index` (`submitted_by_user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -116,7 +118,7 @@ CREATE TABLE `renders` (
 
 LOCK TABLES `renders` WRITE;
 /*!40000 ALTER TABLE `renders` DISABLE KEYS */;
-INSERT INTO `renders` VALUES (5,1,'open',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53'),(6,2,'open',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53');
+INSERT INTO `renders` VALUES (9,1,'complete','2022-12-05 13:29:28','2022-12-05 13:26:44','2022-12-05 13:29:28'),(10,2,'complete','2022-12-05 13:29:38','2022-12-05 13:26:44','2022-12-05 13:29:38');
 /*!40000 ALTER TABLE `renders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -150,7 +152,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (5,'brian','etheridge','betheridge@gmail.com','','admin','available','$2y$10$8noF7dGS.TVeI3fMlODIq.wC0QDSM1QdS4r6eWNbhvIFSYjUgGB4S',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53'),(6,'barry','fiddlestone','contact_bee@yahoo.com','','admin','available','$2y$10$O8mOeFcfH3hsXsrA1oujwec9LSfuLzva5guwU9cs/V0/8kNKTdOMK',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53');
+INSERT INTO `users` VALUES (5,'brian','etheridge','betheridge@gmail.com','','admin','available','$2y$10$8noF7dGS.TVeI3fMlODIq.wC0QDSM1QdS4r6eWNbhvIFSYjUgGB4S',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53'),(6,'barry','fiddlestone','contact_bee@yahoo.com','3.4.5.55','admin','available','$2y$10$O8mOeFcfH3hsXsrA1oujwec9LSfuLzva5guwU9cs/V0/8kNKTdOMK',NULL,'2022-12-03 15:36:53','2022-12-04 14:03:18');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -163,4 +165,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-03 15:37:53
+-- Dump completed on 2022-12-05 13:30:04
