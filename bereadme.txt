@@ -17,3 +17,8 @@ cd Code/srsapi
 
     php artisan migrate
 
+# bash scripting
+    ######## To invoke python !/usr/bin/env python3
+    # Example
+    # nohup python /path/to/test.py &
+

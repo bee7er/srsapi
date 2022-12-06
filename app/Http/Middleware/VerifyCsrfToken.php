@@ -18,5 +18,6 @@ class VerifyCsrfToken extends BaseVerifier
         'api1/rendering',
         'api1/complete',
         'api1/render',
+        'results',
     ];
 }

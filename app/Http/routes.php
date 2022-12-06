@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Renders\RendersController;
 use App\Http\Controllers\Api\Renders\RegistrationsController;
+use App\Http\Controllers\Api\Renders\UploadsController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 
@@ -80,6 +81,13 @@ Route::post('/api1/complete', function (Request $request) {
 Route::post('/api1/render', function (Request $request) {
     return response()->json(
         (new RendersController)->render($request)
+    );
+});
+
+// Uploading files
+Route::post('/results', function (Request $request) {
+    return response()->json(
+        (new UploadsController)->handleUploads($request)
     );
 });
 
