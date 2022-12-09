@@ -17,7 +17,7 @@ class CreateRenderDetailsTable extends Migration
             $table->increments('id');
             $table->integer('render_id')->unsigned()->index();
             $table->integer('allocated_to_user_id')->unsigned()->index();
-            $table->enum('status', array('ready','allocated','done'));
+            $table->enum('status', array('ready','allocated','done','returned'));
             $table->timestamps();
         });
     }

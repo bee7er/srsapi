@@ -10,6 +10,7 @@ class RenderDetail extends Model
     const READY = 'ready';
     const ALLOCATED = 'allocated';
     const DONE = 'done';
+    const RETURNED = 'returned';
 
     /**
      * The attributes that are mass assignable.

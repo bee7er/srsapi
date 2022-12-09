@@ -85,9 +85,16 @@ Route::post('/api1/render', function (Request $request) {
 });
 
 // Uploading files
+Route::post('/projects', function (Request $request) {
+    return response()->json(
+        (new UploadsController)->handleUploadProjects($request)
+    );
+});
+
+// Uploading files
 Route::post('/results', function (Request $request) {
     return response()->json(
-        (new UploadsController)->handleUploads($request)
+        (new UploadsController)->handleUploadResults($request)
     );
 });
 

@@ -14,10 +14,12 @@ class RenderDetailsTableSeeder extends Seeder
     {
         DB::table('render_details')->delete();
 
-        RenderDetail::create(['render_id' => 1,'allocated_to_user_id' => 0,
+        RenderDetail::create(['render_id' => 1,
+            'allocated_to_user_id' => 0,
             'status' => 'ready']);
 
-        RenderDetail::create(['render_id' => 2,'allocated_to_user_id' => 0,
+        RenderDetail::create(['render_id' => 2,
+            'allocated_to_user_id' => 0,
             'status' => 'ready']);
     }
 }

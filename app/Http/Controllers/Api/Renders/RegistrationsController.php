@@ -106,8 +106,8 @@ class RegistrationsController extends Controller
                     ->first();
 
                 if (null == $result) {
-                    Log::info('Nothing to do here');
                     $message = "No renders are currently pending";
+                    Log::info($message);
                     $result = 'OK';
                 } else {
                     Log::info('Render details: ' . print_r($result, true));
@@ -172,8 +172,11 @@ class RegistrationsController extends Controller
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
                 // This function is like a heart beat from the slaves, it signals that the slave
-                // is active but not available
-                // Not sure if we need to do anything here atm
+                // is active
+                // TODO Here we check to see if any earlier requests have been rendered
+                // TODO the slave can then pull down the results
+                // Looking for render details records which are DONE
+
                 $result = 'OK';
 
             } else {

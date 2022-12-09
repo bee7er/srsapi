@@ -17,6 +17,7 @@ class RendersController extends Controller
     // Parameters
     const EMAIL = "email";
     const CUSTOMFRAMERANGE = "custom_frame_range";
+    const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const OVERRIDESETTINGS = "override_settings";
     const FROM = "from";
     const TO = "to";
@@ -59,6 +60,7 @@ class RendersController extends Controller
                 $render = new Render();
                 $render->submitted_by_user_id = $user->id;
                 $render->status = Render::OPEN;
+                $render->c4dProjectWithAssets = $request->get(self::C4DPROJECTWITHASSETS);
                 $render->save();
                 $renderId = $render->id;
                 // Create the detail records
@@ -69,8 +71,6 @@ class RendersController extends Controller
                 // Ok, Render is now ready
                 $render->status = Render::READY;
                 $render->save();
-
-                Log::info('Render details: ' . print_r($render, true));
 
                 $result = 'OK';
 
@@ -83,6 +83,7 @@ class RendersController extends Controller
 
             $received = [
                 self::EMAIL => $request->get(self::EMAIL),
+                self::C4DPROJECTWITHASSETS => $request->get(self::C4DPROJECTWITHASSETS),
                 self::OVERRIDESETTINGS => $request->get(self::OVERRIDESETTINGS),
                 self::CUSTOMFRAMERANGE => $request->get(self::CUSTOMFRAMERANGE),
                 self::FROM => $request->get(self::FROM),
@@ -95,6 +96,7 @@ class RendersController extends Controller
             return $received;   // Gets converted to json
 
         } catch(\Exception $exception) {
+            Log::info('Error: ' . $exception->getMessage());
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
         }
     }
@@ -141,7 +143,7 @@ class RendersController extends Controller
             $result = 'Error';
 
             Log::info('In complete for email: ' . $request->get(self::EMAIL));
-            Log::info('In complete for render details: ' . $request->get(self::RENDERDETAILID));
+            Log::info('In complete for render details id: ' . $request->get(self::RENDERDETAILID));
             // Update the detail record to DONE
             $renderDetailId = $request->get(self::RENDERDETAILID);
             $renderDetail = RenderDetail::find($renderDetailId);
@@ -156,8 +158,6 @@ class RendersController extends Controller
                 ->where('rd.render_id', $renderDetail->render_id)
                 ->where('rd.status', '!=', RenderDetail::DONE)
                 ->get();
-            Log::info('Render details: ' . print_r($result, true));
-
             if (0 >= count($result)) {
                 $render = Render::find($renderDetail->render_id);
                 if (!$render) {
