@@ -16,13 +16,14 @@ class RendersController extends Controller
 {
     // Parameters
     const EMAIL = "email";
-    const CUSTOMFRAMERANGE = "custom_frame_range";
+    const CUSTOMFRAMERANGE = "customFrameRange";
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
-    const OVERRIDESETTINGS = "override_settings";
+    const OUTPUTFORMAT = "outputFormat";
+    const OVERRIDESETTINGS = "overridSsettings";
     const FROM = "from";
     const TO = "to";
-    const RENDERDETAILID = "render_detail_id";
-    const RENDERID = "render_id";
+    const RENDERDETAILID = "renderDetailId";
+    const RENDERID = "renderId";
 
     /**
      * Display a listing of the resource.
@@ -61,6 +62,7 @@ class RendersController extends Controller
                 $render->submitted_by_user_id = $user->id;
                 $render->status = Render::OPEN;
                 $render->c4dProjectWithAssets = $request->get(self::C4DPROJECTWITHASSETS);
+                $render->outputFormat = $request->get(self::OUTPUTFORMAT);
                 $render->save();
                 $renderId = $render->id;
                 // Create the detail records
@@ -84,6 +86,7 @@ class RendersController extends Controller
             $received = [
                 self::EMAIL => $request->get(self::EMAIL),
                 self::C4DPROJECTWITHASSETS => $request->get(self::C4DPROJECTWITHASSETS),
+                self::OUTPUTFORMAT => $request->get(self::OUTPUTFORMAT),
                 self::OVERRIDESETTINGS => $request->get(self::OVERRIDESETTINGS),
                 self::CUSTOMFRAMERANGE => $request->get(self::CUSTOMFRAMERANGE),
                 self::FROM => $request->get(self::FROM),

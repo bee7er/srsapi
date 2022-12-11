@@ -63,6 +63,13 @@ Route::post('/api1/available', function (Request $request) {
     );
 });
 
+// Slave user requesting status of remote and local renders
+Route::post('/api1/status', function (Request $request) {
+    return response()->json(
+        (new RegistrationsController)->status($request)
+    );
+});
+
 // Slave user notifying master that they are rendering
 Route::post('/api1/rendering', function (Request $request) {
     return response()->json(

@@ -1,5 +1,5 @@
 drop table migrations;
-drop table pasword_resets;
+drop table password_resets;
 drop table render_details;
 drop table renders;
 drop table users;
@@ -13,6 +13,6 @@ select * from renders where 1;
 delete from render_details where 1;
 delete from renders where 1;
 	
-INSERT INTO `renders` VALUES (13,1,'ready','2022-12-05 13:29:28','2022-12-05 13:26:44','2022-12-05 13:29:28');
+INSERT INTO `renders` VALUES (13,1,'ready','','','2022-12-05 13:29:28','2022-12-05 13:26:44','2022-12-05 13:29:28');
 
 INSERT INTO `render_details` VALUES (7,13,0,'ready','2022-12-05 13:28:00','2022-12-05 13:29:28'),(8,13,0,'ready','2022-12-05 13:28:00','2022-12-05 13:29:38');

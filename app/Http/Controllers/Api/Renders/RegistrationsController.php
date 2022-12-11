@@ -18,14 +18,14 @@ class RegistrationsController extends Controller
     const  AVAILABILITY_AVAILABLE = 1;
     const  AVAILABILITY_UNAVAILABLE = 2;
     // Parameters
-    const ACTIONINSTRUCTION = "action_instruction";
+    const ACTIONINSTRUCTION = "actionInstruction";
     const AVAILABILITY = "availability";
-    const CUSTOMFRAMERANGE = "custom_frame_range";
+    const CUSTOMFRAMERANGE = "customFrameRange";
     const EMAIL = "email";
     const FROM = "from";
-    const IPADDRESS = "ip_address";
-    const OVERRIDESETTINGS = "override_settings";
-    const RENDERDETAILID = "render_detail_id";
+    const IPADDRESS = "ipAddress";
+    const OVERRIDESETTINGS = "overrideSettings";
+    const RENDERDETAILID = "renderDetailId";
     const TO = "to";
     # Action instruction
     const  AI_DO_RENDER = 'render';
@@ -185,6 +185,34 @@ class RegistrationsController extends Controller
                 Log::info('Error: ' . $message);
                 $result = 'Error';
             }
+
+            $received = [
+                "result" => $result,
+                "message" => $message,
+            ];
+
+            return $received;   // Gets converted to json
+
+        } catch(\Exception $exception) {
+            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+        }
+    }
+
+    /**
+     * Status request from a slave user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function status(Request $request)
+    {
+        try {
+            $message = "Status request received OK";
+            $result = 'Error';
+
+            Log::info('In status request for email: ' . $request->get(self::EMAIL));
+
+            // Do something
 
             $received = [
                 "result" => $result,

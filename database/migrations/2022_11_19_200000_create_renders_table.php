@@ -18,6 +18,7 @@ class CreateRendersTable extends Migration
             $table->integer('submitted_by_user_id')->unsigned()->index();
             $table->enum('status', array('open','ready','rendering','complete'));
             $table->string('c4dProjectWithAssets');
+            $table->string('outputFormat');
             $table->dateTime('completed_at')->nullable();
             $table->timestamps();
         });
