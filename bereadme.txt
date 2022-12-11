@@ -33,8 +33,10 @@ TODO LIST
 			Master updates the email, ipAddress and availability
 			
 		Click Cancel
-			What if has outstanding render submissions?
-			What if in the middle of a render?
+		    If rendering then disallow Cancel
+			Else call /status
+			    Notify user in the dialog that there are outstanding jobs
+			Still Cancel?
 			Logout of master
 			
 		Timer Running
@@ -89,3 +91,44 @@ TODO LIST
             RETURNED
                 Set in /awake when slave notifies that the frame has been downloaded successfully
 		
+		API
+
+		    // Slave registering with the system
+            Route::post('/api1/register', function (Request $request) {
+                User details are sent to the master
+                Timer poll starts notifying master of availability
+            }
+
+            // Slave user notifying master that they are awake
+            Route::post('/api1/awake', function (Request $request) {
+                Action instruction tells slave to download frames
+            }
+
+            // Slave user requesting their current status in the system
+            Route::post('/api1/status', function (Request $request) {
+                Called when they attempt to Cancel the registration dialog
+                This gives them a chance to avoid cancelling and continue polling
+                You have render(s) READY or RENDERING
+                You have render detail(s) READY or ALLOCATED
+            }
+
+            // Slave user notifying master that they are available and not currently rendering
+            Route::post('/api1/available', function (Request $request) {
+                Action instruction tells slave to commence rendering
+            }
+
+            // Slave user notifying master that they are rendering
+            Route::post('/api1/rendering', function (Request $request) {
+
+            // Slave user notifying master that the render they were working on is now complete
+            Route::post('/api1/complete', function (Request $request) {
+
+            // Slave user submitting a render to be processed
+            Route::post('/api1/render', function (Request $request) {
+
+            // Uploading project with assets file
+            Route::post('/projects', function (Request $request) {
+
+            // Uploading the rendered image files
+            Route::post('/results', function (Request $request) {
+			

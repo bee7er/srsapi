@@ -84,14 +84,14 @@ Route::post('/api1/render', function (Request $request) {
     );
 });
 
-// Uploading files
+// Uploading project with assets files
 Route::post('/projects', function (Request $request) {
     return response()->json(
         (new UploadsController)->handleUploadProjects($request)
     );
 });
 
-// Uploading files
+// Uploading rendered image files
 Route::post('/results', function (Request $request) {
     return response()->json(
         (new UploadsController)->handleUploadResults($request)
