@@ -16,14 +16,17 @@ class RendersController extends Controller
 {
     // Parameters
     const EMAIL = "email";
-    const CUSTOMFRAMERANGE = "customFrameRange";
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const OUTPUTFORMAT = "outputFormat";
-    const OVERRIDESETTINGS = "overridSsettings";
+    const OVERRIDESETTINGS = "overrideSettings";
     const FROM = "from";
     const TO = "to";
+    const CUSTOMFRAMERANGES = "customFrameRanges";
     const RENDERDETAILID = "renderDetailId";
     const RENDERID = "renderId";
+
+    const OVERRIDE = 1;
+    const USESETTINGS = 2;
 
     /**
      * Display a listing of the resource.
@@ -55,7 +58,7 @@ class RendersController extends Controller
             // TODO Check if an outstanding request for the same frames is present?
             Log::info('In render for email: ' . $request->get(self::EMAIL));
 
-            $user = User::where('email', $request->get(self::EMAIL)) -> first();
+            $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
                 // Create a new Render record
                 $render = new Render();
@@ -63,13 +66,17 @@ class RendersController extends Controller
                 $render->status = Render::OPEN;
                 $render->c4dProjectWithAssets = $request->get(self::C4DPROJECTWITHASSETS);
                 $render->outputFormat = $request->get(self::OUTPUTFORMAT);
+                $render->from = $request->get(self::FROM);
+                $render->to = $request->get(self::TO);
+                $render->overrideSettings = $request->get(self::OVERRIDESETTINGS);
+                $render->customFrameRanges = $request->get(self::CUSTOMFRAMERANGES);
                 $render->save();
-                $renderId = $render->id;
                 // Create the detail records
-                $renderDetail = new RenderDetail();
-                $renderDetail->render_id = $render->id;
-                $renderDetail->status = RenderDetail::READY;
-                $renderDetail->save();
+                if (self::OVERRIDE == $render->overrideSettings) {
+                    $this->handleCustomRenderDetails($request, $render);
+                } else {
+                    $this->handleRenderDetails($render->id, $render->from, $render->to);
+                }
                 // Ok, Render is now ready
                 $render->status = Render::READY;
                 $render->save();
@@ -88,7 +95,7 @@ class RendersController extends Controller
                 self::C4DPROJECTWITHASSETS => $request->get(self::C4DPROJECTWITHASSETS),
                 self::OUTPUTFORMAT => $request->get(self::OUTPUTFORMAT),
                 self::OVERRIDESETTINGS => $request->get(self::OVERRIDESETTINGS),
-                self::CUSTOMFRAMERANGE => $request->get(self::CUSTOMFRAMERANGE),
+                self::CUSTOMFRAMERANGES => $request->get(self::CUSTOMFRAMERANGES),
                 self::FROM => $request->get(self::FROM),
                 self::TO => $request->get(self::TO),
                 self::RENDERID => $renderId,
@@ -105,85 +112,41 @@ class RendersController extends Controller
     }
 
     /**
-     * Rendering notification from a slave user.
+     * Iterate custom frame ranges and output render details
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
-    public function rendering(Request $request)
+    private function handleCustomRenderDetails(Request $request, Render $render)
     {
-        try {
-            $message = "Rendering notification received OK";
-            $result = 'Error';
-
-            Log::info('In rendering for email: ' . $request->get(self::EMAIL));
-            // Do something
-
-            $result = 'OK';
-
-            $received = [
-                "message" => $message,
-                "result" => $result
-            ];
-
-            return $received;   // Gets converted to json
-
-        } catch(\Exception $exception) {
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+        // TODO will need to chunk the ranges here
+        $ranges = explode(',', $request->get(self::CUSTOMFRAMERANGES));
+        foreach ($ranges as $rangelet) {
+            $range = explode('-', $rangelet);
+            $this->handleRenderDetails($render->id, $range[0], $range[1]);
         }
     }
 
     /**
-     * Complete notification from a slave user.
+     * Iterate from and to frame range and output render details
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
-    public function complete(Request $request)
+    private function handleRenderDetails($renderId, $from, $to )
     {
-        try {
-            $message = "Complete notification received OK";
-            $result = 'Error';
+        // TODO will need to chunk the ranges here
+        $this->outputRenderDetails($renderId, $from, $to);
+    }
 
-            Log::info('In complete for email: ' . $request->get(self::EMAIL));
-            Log::info('In complete for render details id: ' . $request->get(self::RENDERDETAILID));
-            // Update the detail record to DONE
-            $renderDetailId = $request->get(self::RENDERDETAILID);
-            $renderDetail = RenderDetail::find($renderDetailId);
-            if (!$renderDetail) {
-                throw new \Exception("Could not find render detail record with id '{$renderDetailId}'");
-            }
-            $renderDetail->status = RenderDetail::DONE;
-            $renderDetail->save();
-            // If all details are DONE then the render is COMPLETE
-            $result = DB::table('render_details as rd')
-                ->select('rd.id','rd.status')
-                ->where('rd.render_id', $renderDetail->render_id)
-                ->where('rd.status', '!=', RenderDetail::DONE)
-                ->get();
-            if (0 >= count($result)) {
-                $render = Render::find($renderDetail->render_id);
-                if (!$render) {
-                    throw new \Exception("Could not find render record with id '{$renderDetail->render_id}'");
-                }
-                $render->status = Render::COMPLETE;
-                $render->completed_at = date('Y-m-d H:i:s');
-                $render->save();
-                Log::info('Render is COMPLETE with id: ' . $renderDetail->render_id);
-            }
-            $result = 'OK';
-
-            $received = [
-                "message" => $message,
-                "result" => $result
-            ];
-
-            return $received;   // Gets converted to json
-
-        } catch(\Exception $exception) {
-            Log::info('Error: ' . $exception->getMessage());
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
-        }
+    /**
+     * Iterate from and to frame range and output render details
+     *
+     */
+    private function outputRenderDetails($renderId, $from, $to)
+    {
+        $renderDetail = new RenderDetail();
+        $renderDetail->render_id = $renderId;
+        $renderDetail->from = $from;
+        $renderDetail->to = $to;
+        $renderDetail->status = RenderDetail::READY;
+        $renderDetail->save();
     }
 
 }

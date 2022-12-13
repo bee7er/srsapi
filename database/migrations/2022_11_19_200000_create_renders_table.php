@@ -19,6 +19,10 @@ class CreateRendersTable extends Migration
             $table->enum('status', array('open','ready','rendering','complete'));
             $table->string('c4dProjectWithAssets');
             $table->string('outputFormat');
+            $table->integer('from');
+            $table->integer('to');
+            $table->string('overrideSettings');
+            $table->string('customFrameRanges');
             $table->dateTime('completed_at')->nullable();
             $table->timestamps();
         });

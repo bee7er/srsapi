@@ -73,14 +73,14 @@ Route::post('/api1/status', function (Request $request) {
 // Slave user notifying master that they are rendering
 Route::post('/api1/rendering', function (Request $request) {
     return response()->json(
-        (new RendersController)->rendering($request)
+        (new RegistrationsController)->rendering($request)
     );
 });
 
 // Slave user notifying master that the render they were working on is now complete
 Route::post('/api1/complete', function (Request $request) {
     return response()->json(
-        (new RendersController)->complete($request)
+        (new RegistrationsController)->complete($request)
     );
 });
 

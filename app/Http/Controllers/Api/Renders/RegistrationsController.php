@@ -20,13 +20,16 @@ class RegistrationsController extends Controller
     // Parameters
     const ACTIONINSTRUCTION = "actionInstruction";
     const AVAILABILITY = "availability";
+    const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const CUSTOMFRAMERANGE = "customFrameRange";
     const EMAIL = "email";
     const FROM = "from";
     const IPADDRESS = "ipAddress";
+    const OUTPUTFORMAT = "outputFormat";
     const OVERRIDESETTINGS = "overrideSettings";
     const RENDERDETAILID = "renderDetailId";
     const TO = "to";
+
     # Action instruction
     const  AI_DO_RENDER = 'render';
 
@@ -88,6 +91,10 @@ class RegistrationsController extends Controller
             $result = null;
             $actionInstruction = '';
             $renderDetailId = 0;
+            $c4dProjectWithAssets = '';
+            $from = 0;
+            $to = 0;
+            $outputFormat = '';
 
             Log::info('In available user for email: ' . $request->get(self::EMAIL));
 
@@ -99,7 +106,10 @@ class RegistrationsController extends Controller
                 // TODO Here we can allocate renders to this slave if there are any
 
                 $result = DB::table('render_details as rd')
-                    ->select('rd.id','rd.status','r.id as render_id','r.status as render_status')
+                    ->select(
+                        'rd.id','rd.status','rd.from','rd.to',
+                        'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat'
+                    )
                     ->join('renders as r', 'r.id', '=', 'rd.render_id')
                     ->where('r.status', '!=', Render::COMPLETE)
                     ->where('rd.status', RenderDetail::READY)
@@ -128,6 +138,11 @@ class RegistrationsController extends Controller
                     $renderDetail->allocated_to_user_id = $user->id;
                     $renderDetail->save();
 
+                    $c4dProjectWithAssets = $result->c4dProjectWithAssets;
+                    $from = $result->from;
+                    $to = $result->to;
+                    $outputFormat = $result->outputFormat;
+
                     $actionInstruction = self::AI_DO_RENDER;
                 }
 
@@ -143,6 +158,10 @@ class RegistrationsController extends Controller
             $received = [
                 self::ACTIONINSTRUCTION => $actionInstruction,
                 self::RENDERDETAILID => $renderDetailId,
+                self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
+                self::FROM => $from,
+                self::TO => $to,
+                self::OUTPUTFORMAT => $outputFormat,
                 "result" => $result,
                 "message" => $message,
             ];
@@ -222,6 +241,89 @@ class RegistrationsController extends Controller
             return $received;   // Gets converted to json
 
         } catch(\Exception $exception) {
+            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+        }
+    }
+
+
+    /**
+     * Rendering notification from a slave user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function rendering(Request $request)
+    {
+        try {
+            $message = "Rendering notification received OK";
+            $result = 'Error';
+
+            Log::info('In rendering for email: ' . $request->get(self::EMAIL));
+            // Do something
+
+            $result = 'OK';
+
+            $received = [
+                "message" => $message,
+                "result" => $result
+            ];
+
+            return $received;   // Gets converted to json
+
+        } catch(\Exception $exception) {
+            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+        }
+    }
+
+    /**
+     * Complete notification from a slave user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function complete(Request $request)
+    {
+        try {
+            $message = "Complete notification received OK";
+            $result = 'Error';
+
+            Log::info('In complete for email: ' . $request->get(self::EMAIL));
+            Log::info('In complete for render details id: ' . $request->get(self::RENDERDETAILID));
+            // Update the detail record to DONE
+            $renderDetailId = $request->get(self::RENDERDETAILID);
+            $renderDetail = RenderDetail::find($renderDetailId);
+            if (!$renderDetail) {
+                throw new \Exception("Could not find render detail record with id '{$renderDetailId}'");
+            }
+            $renderDetail->status = RenderDetail::DONE;
+            $renderDetail->save();
+            // If all details are DONE then the render is COMPLETE
+            $result = DB::table('render_details as rd')
+                ->select('rd.id','rd.status')
+                ->where('rd.render_id', $renderDetail->render_id)
+                ->where('rd.status', '!=', RenderDetail::DONE)
+                ->get();
+            if (0 >= count($result)) {
+                $render = Render::find($renderDetail->render_id);
+                if (!$render) {
+                    throw new \Exception("Could not find render record with id '{$renderDetail->render_id}'");
+                }
+                $render->status = Render::COMPLETE;
+                $render->completed_at = date('Y-m-d H:i:s');
+                $render->save();
+                Log::info('Render is COMPLETE with id: ' . $renderDetail->render_id);
+            }
+            $result = 'OK';
+
+            $received = [
+                "message" => $message,
+                "result" => $result
+            ];
+
+            return $received;   // Gets converted to json
+
+        } catch(\Exception $exception) {
+            Log::info('Error: ' . $exception->getMessage());
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
         }
     }
