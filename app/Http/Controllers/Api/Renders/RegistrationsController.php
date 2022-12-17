@@ -229,11 +229,11 @@ class RegistrationsController extends Controller
                         $renderDetail->save();
 
                         $c4dProjectWithAssets = $result->c4dProjectWithAssets;
-                        $frameRanges[] = "{$result->from},{$result->to}";
+                        $frameRanges[] = "{$result->from}-{$result->to}";
 
                         Log::info('Returning result: ' . print_r($result, true));
                     }
-                    // Render now set to returned
+                    // Render now set to returned and it is fully processed
                     $render = Render::find($result->render_id);
                     if (!$render) {
                         throw new \Exception("Could not find render record with id '{$result->render_id}'");
