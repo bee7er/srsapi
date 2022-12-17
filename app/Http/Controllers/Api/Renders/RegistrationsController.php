@@ -23,6 +23,7 @@ class RegistrationsController extends Controller
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const CUSTOMFRAMERANGE = "customFrameRange";
     const EMAIL = "email";
+    const FRAMERANGES = "frameRanges";
     const FROM = "from";
     const IPADDRESS = "ipAddress";
     const OUTPUTFORMAT = "outputFormat";
@@ -32,6 +33,7 @@ class RegistrationsController extends Controller
 
     # Action instruction
     const  AI_DO_RENDER = 'render';
+    const  AI_DO_DOWNLOAD = 'download';
 
     /**
      * Register a slave user in the team rendering system
@@ -113,6 +115,8 @@ class RegistrationsController extends Controller
                     ->join('renders as r', 'r.id', '=', 'rd.render_id')
                     ->where('r.status', '!=', Render::COMPLETE)
                     ->where('rd.status', RenderDetail::READY)
+                    ->orderBy('render_id', 'ASC')
+                    ->orderBy('rd.id', 'ASC')
                     ->first();
 
                 if (null == $result) {
@@ -185,16 +189,60 @@ class RegistrationsController extends Controller
         try {
             $message = "Awake notification received OK";
             $result = 'Error';
+            $actionInstruction = '';
+            $c4dProjectWithAssets = '';
+            $frameRanges = [];
 
             Log::info('In awake user for email: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
-                // This function is like a heart beat from the slaves, it signals that the slave
-                // is active
-                // TODO Here we check to see if any earlier requests have been rendered
-                // TODO the slave can then pull down the results
-                // Looking for render details records which are DONE
+                // Heart beat from the slaves, it signals that the slave is active
+                Log::info('Got user for email: ' . $request->get(self::EMAIL));
+
+                // Here we check to see if any earlier requests from this user have been rendered;
+                // the slave user can then pull down the results
+                $results = DB::table('render_details as rd')
+                    ->select(
+                        'rd.id','rd.status','rd.from','rd.to',
+                        'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat'
+                    )
+                    ->join('renders as r', 'r.id', '=', 'rd.render_id')
+                    ->where('r.submitted_by_user_id', '=', $user->id)
+                    ->where('r.status', '=', Render::COMPLETE)
+                    ->orderBy('render_id', 'ASC')
+                    ->orderBy('rd.id', 'ASC')
+                    ->get();
+
+                if (null == $results) {
+                    $message = "No renders are currently available for download";
+                    Log::info($message);
+                } else {
+                    Log::info('Render details available for downloads: ' . print_r($result, true));
+                    foreach ($results as $result) {
+                        // Render detail now set to returned
+                        $renderDetail = RenderDetail::find($result->id);
+                        if (!$renderDetail) {
+                            throw new \Exception("Could not find render detail record with id '{$result->id}'");
+                        }
+                        $renderDetail->status = RenderDetail::RETURNED;
+                        $renderDetail->save();
+
+                        $c4dProjectWithAssets = $result->c4dProjectWithAssets;
+                        $frameRanges[] = "{$result->from},{$result->to}";
+
+                        Log::info('Returning result: ' . print_r($result, true));
+                    }
+                    // Render now set to returned
+                    $render = Render::find($result->render_id);
+                    if (!$render) {
+                        throw new \Exception("Could not find render record with id '{$result->render_id}'");
+                    }
+                    $render->status = Render::RETURNED;
+                    $render->save();
+
+                    $actionInstruction = self::AI_DO_DOWNLOAD;
+                }
 
                 $result = 'OK';
 
@@ -206,6 +254,9 @@ class RegistrationsController extends Controller
             }
 
             $received = [
+                self::ACTIONINSTRUCTION => $actionInstruction,
+                self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
+                self::FRAMERANGES => $frameRanges,
                 "result" => $result,
                 "message" => $message,
             ];
@@ -213,6 +264,7 @@ class RegistrationsController extends Controller
             return $received;   // Gets converted to json
 
         } catch(\Exception $exception) {
+            Log::info('Error exception: ' . $exception->getMessage());
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
         }
     }

@@ -16,7 +16,7 @@ class CreateRendersTable extends Migration
         Schema::create('renders', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('submitted_by_user_id')->unsigned()->index();
-            $table->enum('status', array('open','ready','rendering','complete'));
+            $table->enum('status', array('open','ready','rendering','complete','returned'));
             $table->string('c4dProjectWithAssets');
             $table->string('outputFormat');
             $table->integer('from');

@@ -11,6 +11,7 @@ class Render extends Model
     const READY = 'ready';
     const RENDERING = 'rendering';
     const COMPLETE = 'complete';
+    const RETURNED = 'returned';
 
     /**
      * The attributes that are mass assignable.
