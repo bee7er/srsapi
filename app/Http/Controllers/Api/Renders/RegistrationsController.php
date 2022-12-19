@@ -278,12 +278,61 @@ class RegistrationsController extends Controller
     public function status(Request $request)
     {
         try {
-            $message = "Status request received OK";
+            $message = "Status request received OK\n";
             $result = 'Error';
-
             Log::info('In status request for email: ' . $request->get(self::EMAIL));
 
-            // Do something
+            // Jobs the slave is rendering
+
+            // Jobs the slave has submitted
+
+            $user = User::where('email', $request->get(self::EMAIL)) -> first();
+            if ($user) {
+                $renderResults = DB::table('render_details as rd')
+                    ->select(
+                        'rd.id','rd.status as detail_status','rd.allocated_to_user_id','rd.from','rd.to',
+                        'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat'
+                    )
+                    ->join('renders as r', 'r.id', '=', 'rd.render_id')
+                    ->where('r.submitted_by_user_id', '=', $user->id)
+                    ->where('r.status', '!=', Render::RETURNED)
+                    ->orderBy('render_id', 'ASC')
+                    ->orderBy('rd.id', 'ASC')
+                    ->get();
+
+                if (null == $renderResults) {
+                    $message = "No renders are currently outstanding";
+                    Log::info($message);
+                } else {
+                    Log::info('Render details available for downloads: ' . print_r($renderResults, true));
+                    if ($renderResults) {
+                        $sep = "";
+                        foreach ($renderResults as $render) {
+                            $allocatedUserEmail = 'Not yet allocated';
+                            if (0 < $render->allocated_to_user_id) {
+                                $allocatedUser = User::where('id', $render->allocated_to_user_id)->first();
+                                if ($allocatedUser) {
+                                    $allocatedUserEmail = "with {$allocatedUser->email}";
+                                } else {
+                                    $allocatedUserEmail = "Allocated to unknown with id {$render->allocated_to_user_id}";
+                                }
+                            }
+                            $message .= (
+                                $sep .
+                                "{$render->c4dProjectWithAssets} {$render->render_status} {$render->from} - {$render->to} {$render->detail_status} {$allocatedUserEmail}"
+                            );
+                            $sep = "\n";
+                        }
+                    }
+                }
+
+                $result = 'OK';
+
+            } else {
+                $message = "Could not find user with email: " . $request->get(self::EMAIL);
+                Log::info('Error: ' . $message);
+                $result = 'Error';
+            }
 
             $received = [
                 "result" => $result,
@@ -293,6 +342,7 @@ class RegistrationsController extends Controller
             return $received;   // Gets converted to json
 
         } catch(\Exception $exception) {
+            Log::info('Error: ' . $exception->getMessage());
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
         }
     }
