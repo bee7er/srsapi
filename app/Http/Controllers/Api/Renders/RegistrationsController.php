@@ -124,7 +124,6 @@ class RegistrationsController extends Controller
                     Log::info($message);
                     $result = 'OK';
                 } else {
-                    Log::info('Render details: ' . print_r($result, true));
                     // Set the render to rendering
                     $render = Render::find($result->render_id);
                     if (!$render) {
@@ -231,7 +230,7 @@ class RegistrationsController extends Controller
                         $c4dProjectWithAssets = $result->c4dProjectWithAssets;
                         $frameRanges[] = "{$result->from}-{$result->to}";
 
-                        Log::info('Returning result: ' . print_r($result, true));
+//                        Log::info('Returning result: ' . print_r($result, true));
                     }
                     // Render now set to returned and it is fully processed
                     $render = Render::find($result->render_id);
@@ -282,10 +281,6 @@ class RegistrationsController extends Controller
             $result = 'Error';
             Log::info('In status request for email: ' . $request->get(self::EMAIL));
 
-            // Jobs the slave is rendering
-
-            // Jobs the slave has submitted
-
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
                 $renderResults = DB::table('render_details as rd')
@@ -304,7 +299,7 @@ class RegistrationsController extends Controller
                     $message = "No renders are currently outstanding";
                     Log::info($message);
                 } else {
-                    Log::info('Render details available for downloads: ' . print_r($renderResults, true));
+//                    Log::info('Render details available for downloads: ' . print_r($renderResults, true));
                     if ($renderResults) {
                         $sep = "";
                         foreach ($renderResults as $render) {

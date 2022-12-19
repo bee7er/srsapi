@@ -28,6 +28,8 @@ class RendersController extends Controller
     const OVERRIDE = 1;
     const USESETTINGS = 2;
 
+    const CHUNK = 5;
+
     /**
      * Display a listing of the resource.
      *
@@ -55,8 +57,20 @@ class RendersController extends Controller
             $renderId = 0;
 
             // Write header and detail records to db
-            // TODO Check if an outstanding request for the same frames is present?
             Log::info('In render for email: ' . $request->get(self::EMAIL));
+
+            $this->handleRenderDetails(11, 0, 0);
+            $this->handleRenderDetails(11, 0, 1);
+            $this->handleRenderDetails(11, 0, 4);
+            $this->handleRenderDetails(11, 0, 5);
+            $this->handleRenderDetails(11, 0, 6);
+            $this->handleRenderDetails(11, 0, 7);
+            $this->handleRenderDetails(11, 0, 8);
+            $this->handleRenderDetails(11, 0, 9);
+            $this->handleRenderDetails(11, 0, 10);
+            $this->handleRenderDetails(11, 0, 13);
+            $this->handleRenderDetails(11, 0, 15);
+            $this->handleRenderDetails(11, 0, 17);
 
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
@@ -117,7 +131,6 @@ class RendersController extends Controller
      */
     private function handleCustomRenderDetails(Request $request, Render $render)
     {
-        // TODO will need to chunk the ranges here
         $ranges = explode(',', $request->get(self::CUSTOMFRAMERANGES));
         foreach ($ranges as $rangelet) {
             $range = explode('-', $rangelet);
@@ -129,10 +142,20 @@ class RendersController extends Controller
      * Iterate from and to frame range and output render details
      *
      */
-    private function handleRenderDetails($renderId, $from, $to )
+    private function handleRenderDetails($renderId, $from, $to)
     {
-        // TODO will need to chunk the ranges here
-        $this->outputRenderDetails($renderId, $from, $to);
+        // Chunk it up
+        Log::info("Chunking render details $from - $to");
+        while (($to - $from) >= 0) {
+            $topOfRange = $from + self::CHUNK - 1;
+            if ($topOfRange > $to) {
+                $topOfRange = $to;
+            }
+            //Log::info("Chunk FROM - TO: $from - $topOfRange");
+            $this->outputRenderDetails($renderId, $from, $topOfRange);
+
+            $from += self::CHUNK;
+        }
     }
 
     /**

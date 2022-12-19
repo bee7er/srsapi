@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Renders\RegistrationsController;
 use App\Http\Controllers\Api\Renders\UploadsController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 Route::get('/', 'HomeController@index');
 
