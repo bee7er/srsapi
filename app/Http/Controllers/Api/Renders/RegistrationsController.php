@@ -25,7 +25,6 @@ class RegistrationsController extends Controller
     const EMAIL = "email";
     const FRAMERANGES = "frameRanges";
     const FROM = "from";
-    const IPADDRESS = "ipAddress";
     const OUTPUTFORMAT = "outputFormat";
     const OVERRIDESETTINGS = "overrideSettings";
     const RENDERDETAILID = "renderDetailId";
@@ -51,9 +50,8 @@ class RegistrationsController extends Controller
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
-                // Update user with ipAddress and availability
+                // Update user with availability
                 $user->status     = ($request->get(self::AVAILABILITY) == self::AVAILABILITY_AVAILABLE ? 'available': 'unavailable');
-                $user->ip_address = $request->get(self::IPADDRESS);
                 $user->save();
                 Log::info('User saved OK');
             } else {
@@ -65,7 +63,6 @@ class RegistrationsController extends Controller
 
             $received = [
                 "email" => $request->get(self::EMAIL),
-                "ipAddress" => $request->get(self::IPADDRESS),
                 "availability" => $request->get(self::AVAILABILITY),
                 "result" => $result,
                 "message" => $message,
