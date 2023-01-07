@@ -8,32 +8,37 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <div class="panel panel-default">
-                        <div class="panel-heading">Edit User Profile</div>
+                        <div class="panel-heading">Render Profile</div>
                         <div class="panel-body">
 
-                            {!! Form::open(['route' => 'users.update', 'method' => 'put', 'class' => 'form-horizontal']) !!}
-                            {!! Form::hidden('id', $user->id) !!}
+                            {!! Form::open(['class' => 'form-horizontal']) !!}
+                            {!! Form::hidden('status', $render->status) !!}
+
+                            <div class="form-group">
+                                {!! Form::label('id', 'Render id', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('id', $render->id, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
+                            </div>
 
                             <div class="form-group">
                                 {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('first_name', $user->first_name, ['class' => 'col-md-6']) !!}
+                                {!! Form::text('first_name', $render->first_name, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">
                                 {!! Form::label('surname', 'Surname', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('surname', $user->surname, ['class' => 'col-md-6']) !!}
+                                {!! Form::text('surname', $render->surname, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">
                                 {!! Form::label('email', 'Email', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('email', $user->email, ['class' => 'col-md-6']) !!}
+                                {!! Form::text('email', $render->email, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">
                                 {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
-                                <select name="status">
+                                <select name="status" disabled="disabled">
                                     @foreach ($statuses as $status)
-                                        <option value="{{ $status }}" {{ $user->status == $status ? 'selected="selected"' : '' }}>
+                                        <option value="{{ $status }}" {{ $render->status == $status ? 'selected="selected"' : '' }}>
                                             {{ $status }}
                                         </option>
                                     @endforeach
@@ -41,9 +46,7 @@
                             </div>
 
                             <div class="form-group">
-                                {!! Form::submit('Delete', ['class' => 'col-md-2 col-md-offset-4 btn btn-primary']) !!}
-
-                                {!! Form::submit('Update', ['class' => 'col-md-2 col-md-offset-2 btn btn-primary']) !!}
+                                {!! link_to_action('RendersController@edit', 'Edit profile', $parameters = ['id' => $render->id], $attributes = ['class' => 'col-md-6 col-md-offset-4']) !!}
                             </div>
 
                             {!! Form::close() !!}

@@ -19,7 +19,7 @@ class PagesController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    protected function cookies()
+    public function cookies()
     {
         return view('pages/cookies');
     }

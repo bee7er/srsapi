@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="content">
-        <h1>Some content needed</h1>
+        <h1>Welcome to the Shared Render Service</h1>
     </div>
 
 @stop

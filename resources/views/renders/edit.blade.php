@@ -8,42 +8,32 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <div class="panel panel-default">
-                        <div class="panel-heading">New User Profile</div>
+                        <div class="panel-heading">Edit Render Profile</div>
                         <div class="panel-body">
 
-                            {!! Form::open(['url' => 'users', 'class' => 'form-horizontal']) !!}
+                            {!! Form::open(['route' => 'renders.update', 'method' => 'put', 'class' => 'form-horizontal']) !!}
+                            {!! Form::hidden('id', $render->id) !!}
 
                             <div class="form-group">
                                 {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('first_name', null, ['class' => 'col-md-6']) !!}
+                                {!! Form::text('first_name', $render->first_name, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">
                                 {!! Form::label('surname', 'Surname', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('surname', null, ['class' => 'col-md-6']) !!}
+                                {!! Form::text('surname', $render->surname, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">
                                 {!! Form::label('email', 'Email', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('email', null, ['class' => 'col-md-6']) !!}
-                            </div>
-
-                            <div class="form-group">
-                                {!! Form::label('password', 'Password', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::password('password', ['class' => 'col-md-6']) !!}
-                            </div>
-
-                            <div class="form-group">
-                                {!! Form::label('password_confirmation', 'Confirm password', ['class' => 'col-md-4
-                                control-label']) !!}
-                                {!! Form::password('password_confirmation', ['class' => 'col-md-6']) !!}
+                                {!! Form::text('email', $render->email, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">
                                 {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
                                 <select name="status">
                                     @foreach ($statuses as $status)
-                                        <option value="{{ $status }}">
+                                        <option value="{{ $status }}" {{ $render->status == $status ? 'selected="selected"' : '' }}>
                                             {{ $status }}
                                         </option>
                                     @endforeach
@@ -51,7 +41,9 @@
                             </div>
 
                             <div class="form-group">
-                                {!! Form::submit('Submit', ['class' => 'col-md-6 col-md-offset-4 btn btn-primary']) !!}
+                                {!! Form::submit('Delete', ['class' => 'col-md-2 col-md-offset-4 btn btn-primary']) !!}
+
+                                {!! Form::submit('Update', ['class' => 'col-md-2 col-md-offset-2 btn btn-primary']) !!}
                             </div>
 
                             {!! Form::close() !!}

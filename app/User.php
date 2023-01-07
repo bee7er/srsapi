@@ -43,4 +43,11 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     protected $hidden = ['password', 'remember_token'];
+
+    /**
+     * The statuses a user can adopt.
+     *
+     * @var array
+     */
+    public static $statuses = ['available', 'unavailable', 'rendering'];
 }

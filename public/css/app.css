@@ -14,4 +14,38 @@ body, label, .checkbox label {
 .shine {
   color: #fff !important; }
 
-/*# sourceMappingURL=app.css.map */
+th, td {
+  padding: 4px;
+}
+
+th {
+  text-align: center;
+}
+
+table {
+  border-spacing: 4px;
+}
+
+.ready {
+  color: green;
+  font-weight: bold;
+}
+
+.allocated {
+  color: blue;
+  font-weight: bold;
+}
+
+.returned {
+  color: gray;
+  font-weight: bold;
+}
+
+.srs-link {
+  font-weight: bold;
+}
+
+.srs-title {
+  font-weight: bold;
+  color: greenyellow !important;
+}

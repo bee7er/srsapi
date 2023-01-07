@@ -59,19 +59,6 @@ class RendersController extends Controller
             // Write header and detail records to db
             Log::info('In render for email: ' . $request->get(self::EMAIL));
 
-            $this->handleRenderDetails(11, 0, 0);
-            $this->handleRenderDetails(11, 0, 1);
-            $this->handleRenderDetails(11, 0, 4);
-            $this->handleRenderDetails(11, 0, 5);
-            $this->handleRenderDetails(11, 0, 6);
-            $this->handleRenderDetails(11, 0, 7);
-            $this->handleRenderDetails(11, 0, 8);
-            $this->handleRenderDetails(11, 0, 9);
-            $this->handleRenderDetails(11, 0, 10);
-            $this->handleRenderDetails(11, 0, 13);
-            $this->handleRenderDetails(11, 0, 15);
-            $this->handleRenderDetails(11, 0, 17);
-
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
                 // Create a new Render record

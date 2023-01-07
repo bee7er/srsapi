@@ -41,7 +41,9 @@ class UsersController extends Controller
      */
     public function create()
     {
-        return view('users.create');
+        $statuses = User::$statuses;
+
+        return view('users.create', compact('statuses'));
     }
 
     /**
@@ -68,7 +70,7 @@ class UsersController extends Controller
                 ->withInput(Input::except('password'));
         } else {
             $user = new User();
-            $user->status     = (Input::get('status') ? 'active': 'inactive');
+            $user->status     = Input::get('status');
             $user->first_name = Input::get('first_name');
             $user->surname    = Input::get('surname');
             $user->email      = Input::get('email');
@@ -90,8 +92,9 @@ class UsersController extends Controller
     public function show($id)
     {
         $user = User::where('id', $id)->first();
+        $statuses = User::$statuses;
 
-        return view('users.show', compact('user'));
+        return view('users.show', compact('user', 'statuses'));
     }
 
     /**
@@ -104,8 +107,9 @@ class UsersController extends Controller
     {
         //dd('got-='.$id);
         $user = User::where('id', $id)->first();
+        $statuses = User::$statuses;
 
-        return view('users.edit', compact('user'));
+        return view('users.edit', compact('user', 'statuses'));
     }
 
     /**
@@ -137,7 +141,7 @@ class UsersController extends Controller
                     ->withErrors($validator)
                     ->withInput(Input::except('password'));
             }
-            $user->status     = (Input::get('status') ? 'active': 'inactive');
+            $user->status     = Input::get('status');
             $user->first_name = Input::get('first_name');
             $user->surname    = Input::get('surname');
             $user->email      = Input::get('email');

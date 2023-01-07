@@ -8,10 +8,10 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <div class="panel panel-default">
-                        <div class="panel-heading">New User Profile</div>
+                        <div class="panel-heading">New Render Profile</div>
                         <div class="panel-body">
 
-                            {!! Form::open(['url' => 'users', 'class' => 'form-horizontal']) !!}
+                            {!! Form::open(['url' => 'renders', 'class' => 'form-horizontal']) !!}
 
                             <div class="form-group">
                                 {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}

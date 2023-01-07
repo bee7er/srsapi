@@ -34,11 +34,6 @@ class Authenticate
      */
     public function handle($request, Closure $next)
     {
-
-        dd('Dying');
-
-
-
         if ($this->auth->guest()) {
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);

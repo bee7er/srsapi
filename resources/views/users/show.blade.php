@@ -35,6 +35,17 @@
                             </div>
 
                             <div class="form-group">
+                                {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
+                                <select name="status" disabled="disabled">
+                                    @foreach ($statuses as $status)
+                                        <option value="{{ $status }}" {{ $user->status == $status ? 'selected="selected"' : '' }}>
+                                            {{ $status }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group">
                                 {!! link_to_action('UsersController@edit', 'Edit profile', $parameters = ['id' => $user->id], $attributes = ['class' => 'col-md-6 col-md-offset-4']) !!}
                             </div>
 

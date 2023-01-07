@@ -3,18 +3,19 @@
 use App\Http\Controllers\Api\Renders\RendersController;
 use App\Http\Controllers\Api\Renders\RegistrationsController;
 use App\Http\Controllers\Api\Renders\UploadsController;
-use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 Route::get('/', 'HomeController@index');
 
 Route::get('home', 'HomeController@index');
 
-Route::get('contact', 'ContactController@index');
+Route::get('renders', 'RendersController@index');
+Route::get('reassign', 'RendersController@reassign');
 
 Route::get('cookies', 'PagesController@cookies');
 
+// Make the following classes available in the views
+Route::resource('renders', 'RendersController');
 Route::resource('users', 'UsersController');
 
 // Authentication, registering 2 controllers
@@ -105,8 +106,6 @@ Route::post('/results', function (Request $request) {
         (new UploadsController)->handleUploadResults($request)
     );
 });
-
-
 
 
 //*******************

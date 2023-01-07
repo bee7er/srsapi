@@ -26,6 +26,23 @@ cd Code/srsapi
 
 TODO LIST
 
+	On render request show dialog:
+		 do you want to save the current project to current location?
+		 with or without assets?
+		 	with: fresh save project with assets and send that off
+			without: save just the project and send that off
+			
+		remove from and to range and just use it in the background
+		
+		output format
+			remove that and pick it up from the settings
+			
+		remove the project name and output format from dialog
+		
+		download images/psds as and when they are done, not wait for the whole render to be done
+		
+		
+
 	Registration plugin
 
 		Click OK
@@ -80,5 +97,4 @@ TODO LIST
 				Allow cancel
 				Allow cancel and reallocate
 				
-
-			
+	

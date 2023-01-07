@@ -1,5 +1,7 @@
 <?php
 
+use App\RenderDetail;
+
 return [
 
     /*
@@ -206,6 +208,7 @@ return [
         'Form'      => Illuminate\Html\FormFacade::class,
         'Html'      => Illuminate\Html\HtmlFacade::class,
         'Flash'     => Laracasts\Flash\Flash::class,
+        'RenderDetail' => App/RenderDetail::class,
     ],
 
 ];

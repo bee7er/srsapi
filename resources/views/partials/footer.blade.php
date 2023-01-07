@@ -1,3 +1,3 @@
 <div id="footer">
-    Copyright &copy; 2015 b etheridge
+    Copyright &copy; {{ (new DateTime)->format('Y') }} brian etheridge
 </div>
