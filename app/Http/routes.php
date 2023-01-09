@@ -21,7 +21,7 @@ Route::resource('users', 'UsersController');
 // Authentication, registering 2 controllers
 Route::controllers([
     'auth' => 'Auth\AuthController',
-    'password' => 'Auth\PasswordController',
+    'password' => 'Auth\PasswordController'
 ]);
 
 /*

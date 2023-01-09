@@ -34,7 +34,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES ('2022_11_19_000000_create_users_table',1),('2022_11_19_100000_create_password_resets_table',1),('2022_11_19_200000_create_renders_table',1),('2022_11_19_300000_create_render_details_table',2);
+INSERT INTO `migrations` VALUES ('2022_11_19_000000_create_users_table',1),('2022_11_19_100000_create_password_resets_table',1),('2022_11_19_200000_create_renders_table',1),('2022_11_19_300000_create_render_details_table',1);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -74,13 +74,15 @@ CREATE TABLE `render_details` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `render_id` int(10) unsigned NOT NULL,
   `allocated_to_user_id` int(10) unsigned NOT NULL,
-  `status` enum('ready','allocated','done') COLLATE utf8_unicode_ci NOT NULL,
+  `from` int(11) NOT NULL,
+  `to` int(11) NOT NULL,
+  `status` enum('ready','allocated','done','returned') COLLATE utf8_unicode_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `render_details_render_id_index` (`render_id`),
   KEY `render_details_allocated_to_user_id_index` (`allocated_to_user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=180 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -89,7 +91,7 @@ CREATE TABLE `render_details` (
 
 LOCK TABLES `render_details` WRITE;
 /*!40000 ALTER TABLE `render_details` DISABLE KEYS */;
-INSERT INTO `render_details` VALUES (3,9,6,'done','2022-12-05 13:28:00','2022-12-05 13:29:28'),(4,10,6,'done','2022-12-05 13:28:00','2022-12-05 13:29:38');
+INSERT INTO `render_details` VALUES (61,11,0,0,0,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(62,11,0,0,1,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(63,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(64,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(65,11,0,5,5,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(66,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(67,11,0,5,6,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(68,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(69,11,0,5,7,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(70,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(71,11,0,5,8,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(72,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(73,11,0,5,9,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(74,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(75,11,0,5,9,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(76,11,0,10,10,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(77,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(78,11,0,5,9,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(79,11,0,10,13,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(80,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(81,11,0,5,9,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(82,11,0,10,14,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(83,11,0,15,15,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(84,11,0,0,4,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(85,11,0,5,9,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(86,11,0,10,14,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(87,11,0,15,17,'ready','2022-12-25 13:45:30','2022-12-25 13:45:30'),(88,3,1,1,4,'returned','2022-12-25 13:45:30','2022-12-26 18:05:50'),(89,3,0,5,8,'ready','2022-12-25 13:45:30','2023-01-07 14:05:33'),(90,3,0,14,18,'ready','2022-12-25 13:45:30','2023-01-07 13:31:34'),(91,3,2,19,23,'returned','2022-12-25 13:45:30','2022-12-26 18:05:50'),(92,11,0,0,0,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(93,11,0,0,1,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(94,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(95,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(96,11,0,5,5,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(97,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(98,11,0,5,6,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(99,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(100,11,0,5,7,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(101,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(102,11,0,5,8,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(103,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(104,11,0,5,9,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(105,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(106,11,0,5,9,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(107,11,0,10,10,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(108,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(109,11,0,5,9,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(110,11,0,10,13,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(111,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(112,11,0,5,9,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(113,11,0,10,14,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(114,11,0,15,15,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(115,11,0,0,4,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(116,11,0,5,9,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(117,11,0,10,14,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(118,11,0,15,17,'ready','2022-12-26 18:07:50','2022-12-26 18:07:50'),(119,4,2,45,49,'returned','2022-12-26 18:07:50','2022-12-26 18:08:06'),(120,4,2,50,50,'returned','2022-12-26 18:07:50','2022-12-26 18:08:06'),(121,11,0,0,0,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(122,11,0,0,1,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(123,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(124,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(125,11,0,5,5,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(126,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(127,11,0,5,6,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(128,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(129,11,0,5,7,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(130,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(131,11,0,5,8,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(132,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(133,11,0,5,9,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(134,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(135,11,0,5,9,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(136,11,0,10,10,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(137,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(138,11,0,5,9,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(139,11,0,10,13,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(140,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(141,11,0,5,9,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(142,11,0,10,14,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(143,11,0,15,15,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(144,11,0,0,4,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(145,11,0,5,9,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(146,11,0,10,14,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(147,11,0,15,17,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(148,5,0,45,49,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(149,5,0,50,50,'ready','2023-01-04 14:20:47','2023-01-04 14:20:47'),(150,11,0,0,0,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(151,11,0,0,1,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(152,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(153,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(154,11,0,5,5,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(155,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(156,11,0,5,6,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(157,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(158,11,0,5,7,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(159,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(160,11,0,5,8,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(161,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(162,11,0,5,9,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(163,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(164,11,0,5,9,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(165,11,0,10,10,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(166,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(167,11,0,5,9,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(168,11,0,10,13,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(169,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(170,11,0,5,9,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(171,11,0,10,14,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(172,11,0,15,15,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(173,11,0,0,4,'ready','2023-01-04 14:28:06','2023-01-04 14:28:06'),(174,11,0,5,9,'ready','2023-01-04 14:28:07','2023-01-04 14:28:07'),(175,11,0,10,14,'ready','2023-01-04 14:28:07','2023-01-04 14:28:07'),(176,11,0,15,17,'ready','2023-01-04 14:28:07','2023-01-04 14:28:07'),(177,6,0,45,49,'ready','2023-01-04 14:28:07','2023-01-04 14:28:07'),(178,6,0,50,50,'ready','2023-01-04 14:28:07','2023-01-04 14:28:07'),(179,6,0,15,15,'ready','2023-01-04 14:28:07','2023-01-04 14:28:07');
 /*!40000 ALTER TABLE `render_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -103,13 +105,19 @@ DROP TABLE IF EXISTS `renders`;
 CREATE TABLE `renders` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `submitted_by_user_id` int(10) unsigned NOT NULL,
-  `status` enum('open','ready','rendering','complete') COLLATE utf8_unicode_ci NOT NULL,
+  `status` enum('open','ready','rendering','complete','returned') COLLATE utf8_unicode_ci NOT NULL,
+  `c4dProjectWithAssets` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `outputFormat` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `from` int(11) NOT NULL,
+  `to` int(11) NOT NULL,
+  `overrideSettings` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `customFrameRanges` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `completed_at` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `renders_submitted_by_user_id_index` (`submitted_by_user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -118,7 +126,7 @@ CREATE TABLE `renders` (
 
 LOCK TABLES `renders` WRITE;
 /*!40000 ALTER TABLE `renders` DISABLE KEYS */;
-INSERT INTO `renders` VALUES (9,1,'complete','2022-12-05 13:29:28','2022-12-05 13:26:44','2022-12-05 13:29:28'),(10,2,'complete','2022-12-05 13:29:38','2022-12-05 13:26:44','2022-12-05 13:29:38');
+INSERT INTO `renders` VALUES (3,2,'returned','RedshiftTestBeWA.c4d','PNG',0,0,'1','1-4,5-8,14-23','2022-12-26 18:05:49','2022-12-25 13:45:30','2022-12-26 18:05:50'),(4,2,'returned','RedshiftTestBeWA.c4d','PNG',0,90,'1','45-50','2022-12-26 18:08:06','2022-12-26 18:07:50','2022-12-26 18:08:06'),(5,2,'ready','RedshiftTestBeWA.c4d','PNG',0,90,'1','45-50',NULL,'2023-01-04 14:20:47','2023-01-04 14:20:47'),(6,2,'ready','RedshiftTestBeWA.c4d','PNG',0,90,'1','45-50,15-15',NULL,'2023-01-04 14:28:07','2023-01-04 14:28:07');
 /*!40000 ALTER TABLE `renders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -134,16 +142,15 @@ CREATE TABLE `users` (
   `first_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `surname` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `ip_address` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `role` enum('admin','user') COLLATE utf8_unicode_ci NOT NULL,
-  `status` enum('available','unavailable') COLLATE utf8_unicode_ci NOT NULL,
+  `status` enum('available','unavailable','rendering') COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
   `remember_token` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -152,7 +159,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (5,'brian','etheridge','betheridge@gmail.com','','admin','available','$2y$10$8noF7dGS.TVeI3fMlODIq.wC0QDSM1QdS4r6eWNbhvIFSYjUgGB4S',NULL,'2022-12-03 15:36:53','2022-12-03 15:36:53'),(6,'barry','fiddlestone','contact_bee@yahoo.com','3.4.5.55','admin','available','$2y$10$O8mOeFcfH3hsXsrA1oujwec9LSfuLzva5guwU9cs/V0/8kNKTdOMK',NULL,'2022-12-03 15:36:53','2022-12-04 14:03:18');
+INSERT INTO `users` VALUES (1,'brian','etheridge','betheridge@gmail.com','admin','available','$2y$10$Kwc7u4h.9B.OJdxhlrtlMuCFHyl/tYV9d2ikvXLoySSY/JtWNiUSC',NULL,'2022-12-23 14:37:14','2023-01-04 15:34:09'),(2,'barry','fiddlestone','contact_bee@yahoo.com','admin','unavailable','$2y$10$lUbAdQ8gDy5TlgEMGUDQVOYhurndCsDZCzXFD.tm0p3tG5mXG//hG','iS01B85BrZJldu9OYkBASKeE7KG7WIpJ9QyNhXcGHCPEN39Dd0bMA7FmCVlW','2022-12-23 14:37:14','2023-01-07 14:13:09');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -165,4 +172,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-05 13:30:04
+-- Dump completed on 2023-01-07 14:23:34

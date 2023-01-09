@@ -41,6 +41,16 @@ table {
   font-weight: bold;
 }
 
+.rendering {
+  color: red;
+  font-weight: bold;
+}
+
+.complete, .done {
+  color: darkred;
+  font-weight: bold;
+}
+
 .srs-link {
   font-weight: bold;
 }
@@ -48,4 +58,17 @@ table {
 .srs-title {
   font-weight: bold;
   color: greenyellow !important;
+}
+
+.srs-label {
+  font-weight: bold;
+}
+
+.srs-id {
+  text-align: center;
+}
+
+.srs-footer {
+  margin-top: 20px;
+  text-align: center;
 }

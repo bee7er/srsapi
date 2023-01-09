@@ -50,4 +50,26 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     public static $statuses = ['available', 'unavailable', 'rendering'];
+
+    /**
+     * Build and return user name
+     */
+    public function getName() {
+        return $this->first_name . ' ' . $this->surname;
+    }
+
+    /**
+     * Populate this object from the supplied object
+     */
+    public function populate($fromObject) {
+        $this->first_name = $fromObject->first_name;
+        $this->surname = $fromObject->surname;
+        $this->email = $fromObject->email;
+        $this->role = $fromObject->role;
+        $this->status = $fromObject->status;
+        $this->password = $fromObject->password;
+        $this->remember_token = $fromObject->remember_token;
+        $this->created_at = $fromObject->created_at;
+        $this->updated_at = $fromObject->updated_at;
+    }
 }
