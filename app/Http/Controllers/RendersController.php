@@ -48,50 +48,7 @@ class RendersController extends Controller
                 ->orderBy('u.surname', 'u.first_name')
                 ->get();
 
-            // Get all the current renders
-            $builder = DB::table('render_details as rd')
-                ->select(
-                    'rd.id as render_detail_id','rd.status as detail_status','rd.from','rd.to',
-                    'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat',
-                    'r.created_at','r.completed_at',
-                    'u.surname','u.first_name'
-                )
-                ->join('renders as r', 'r.id', '=', 'rd.render_id')
-                ->leftjoin('users as u', 'u.id', '=', 'rd.allocated_to_user_id');
-            // If selected user id not null or zero
-            if (0 != $selectedUserId) {
-                $builder->where('r.submitted_by_user_id', '=', $selectedUserId);
-            }
-            // If include returned is not yes exclude them
-            if (!isset($includeReturned)) {
-                $builder->where('r.status', '!=', Render::RETURNED);
-            }
-            $submissions = $builder
-                ->orderBy('r.id', 'ASC')
-                ->orderBy('render_status', 'ASC')
-                ->get();
-
-            $builder = DB::table('render_details as rd')
-                ->select(
-                    'rd.id as render_detail_id','rd.status as detail_status','rd.from','rd.to',
-                    'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat',
-                    'r.created_at','r.completed_at',
-                    'u.surname','u.first_name'
-                )
-                ->join('renders as r', 'r.id', '=', 'rd.render_id')
-                ->join('users as u', 'u.id', '=', 'r.submitted_by_user_id');
-            // If selected user id not null or zero
-            if (0 != $selectedUserId) {
-                $builder->where('rd.allocated_to_user_id', '=', $selectedUserId);
-            }
-            // If include returned is not yes exclude them
-            if (!isset($includeReturned)) {
-                $builder->where('r.status', '!=', Render::RETURNED);
-            }
-            $renders = $builder
-                ->orderBy('r.id', 'ASC')
-                ->orderBy('render_status', 'ASC')
-                ->get();
+            list($submissions, $renders) = RenderDetail::getSubmisionsAndRenders($selectedUserId, $includeReturned);
 
         } catch(Exception $e) {
             Session::flash('flash_message', 'Error gathering render data: ' . $e->getMessage());

@@ -91,7 +91,7 @@ class RendersController extends Controller
                 $result = 'Error';
             }
 
-            $received = [
+            $returnData = [
                 self::EMAIL => $request->get(self::EMAIL),
                 self::C4DPROJECTWITHASSETS => $request->get(self::C4DPROJECTWITHASSETS),
                 self::OUTPUTFORMAT => $request->get(self::OUTPUTFORMAT),
@@ -104,7 +104,7 @@ class RendersController extends Controller
                 "result" => $result
             ];
 
-            return $received;   // Gets converted to json
+            return $returnData;   // Gets converted to json
 
         } catch(\Exception $exception) {
             Log::info('Error: ' . $exception->getMessage());

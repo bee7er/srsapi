@@ -10,7 +10,7 @@
 
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
+                <div class="col-md-10 col-md-offset-2">
                     <div class="panel panel-default">
                         <div class="panel-heading">List of Renders</div>
                         <div style="text-align: center">
@@ -50,11 +50,12 @@
                                     </tr>
                                     <tr>
                                         <th>Render Id</th>
+                                        <th>Project</th>
                                         <th>Render Status</th>
                                         <th>Chunk Status</th>
                                         <th>Allocated to</th>
-                                        <th>Submitted</th>
-                                        <th>Completed</th>
+                                        <th>Submitted at</th>
+                                        <th>Completed at</th>
                                         <th>Action</th>
                                     </tr>
 
@@ -62,11 +63,12 @@
                                         @foreach ($submissions as $render)
                                             <tr>
                                                 <td class="srs-id">{!! $render->render_id !!}</td>
+                                                <td class="">{!! $render->c4dProjectWithAssets !!}</td>
                                                 <td class="{!! $render->render_status !!}">{!! $render->render_status !!}</td>
                                                 <td class="{!! $render->detail_status !!}">{!! $render->detail_status !!}</td>
                                                 <td>{!! $render->first_name !!} {!! $render->surname !!}</td>
                                                 <td>{!! date('d/m/Y H:i', strtotime($render->created_at)) !!}</td>
-                                                <td>{!! date('d/m/Y H:i', strtotime($render->completed_at)) !!}</td>
+                                                <td>{!! ($render->completed_at ? date('d/m/Y H:i', strtotime($render->completed_at)): '') !!}</td>
                                                 <td title="Render detail id: {!! $render->render_detail_id !!}">
                                                     @if ($render->detail_status == RenderDetail::ALLOCATED)
                                                     {!! link_to_action('RendersController@reassign', 'Reassign', $parameters = ['render_detail_id' => $render->render_detail_id], $attributes = []) !!}
@@ -89,11 +91,12 @@
                                     </tr>
                                     <tr>
                                         <th>Render Id</th>
+                                        <th>Project</th>
                                         <th>Render Status</th>
                                         <th>Chunk Status</th>
                                         <th>Submitted by</th>
-                                        <th>Submitted</th>
-                                        <th>Completed</th>
+                                        <th>Submitted at</th>
+                                        <th>Completed at</th>
                                         <th>Action</th>
                                     </tr>
 
@@ -101,11 +104,12 @@
                                         @foreach ($renders as $render)
                                             <tr>
                                                 <td class="srs-id">{!! $render->render_id !!}</td>
+                                                <td class="">{!! $render->c4dProjectWithAssets !!}</td>
                                                 <td class="{!! $render->render_status !!}">{!! $render->render_status !!}</td>
                                                 <td class="{!! $render->detail_status !!}">{!! $render->detail_status !!}</td>
                                                 <td>{!! $render->first_name !!} {!! $render->surname !!}</td>
                                                 <td>{!! date('d/m/Y H:i', strtotime($render->created_at)) !!}</td>
-                                                <td>{!! date('d/m/Y H:i', strtotime($render->completed_at)) !!}</td>
+                                                <td>{!! ($render->completed_at ? date('d/m/Y H:i', strtotime($render->completed_at)): '') !!}</td>
                                                 <td title="Render detail id: {!! $render->render_detail_id !!}">
                                                     @if ($render->detail_status == RenderDetail::ALLOCATED)
                                                         {!! link_to_action('RendersController@reassign', 'Reassign', $parameters = ['render_detail_id' => $render->render_detail_id], $attributes = []) !!}

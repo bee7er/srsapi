@@ -19,6 +19,7 @@ class RegistrationsController extends Controller
     const  AVAILABILITY_UNAVAILABLE = 2;
     // Parameters
     const ACTIONINSTRUCTION = "actionInstruction";
+    const ALLOCATEDTOUSERS = "allocatedToUsers";
     const AVAILABILITY = "availability";
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const CUSTOMFRAMERANGE = "customFrameRange";
@@ -33,6 +34,7 @@ class RegistrationsController extends Controller
     # Action instruction
     const  AI_DO_RENDER = 'render';
     const  AI_DO_DOWNLOAD = 'download';
+    const  AI_DO_DISPLAY_OUTSTANDING = 'outstanding';
 
     /**
      * Register a slave user in the team rendering system
@@ -61,14 +63,14 @@ class RegistrationsController extends Controller
                 $result = 'Error';
             }
 
-            $received = [
+            $returnData = [
                 "email" => $request->get(self::EMAIL),
                 "availability" => $request->get(self::AVAILABILITY),
                 "result" => $result,
                 "message" => $message,
             ];
 
-            return $received;
+            return $returnData;
 
         } catch(\Exception $exception) {
             Log::info('Exception: ' . $exception->getMessage());
@@ -155,7 +157,7 @@ class RegistrationsController extends Controller
                 $result = 'Error';
             }
 
-            $received = [
+            $returnData = [
                 self::ACTIONINSTRUCTION => $actionInstruction,
                 self::RENDERDETAILID => $renderDetailId,
                 self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
@@ -166,7 +168,7 @@ class RegistrationsController extends Controller
                 "message" => $message,
             ];
 
-            return $received;   // Gets converted to json
+            return $returnData;   // Gets converted to json
 
         } catch(\Exception $exception) {
             Log::info('Error: ' . $exception->getMessage());
@@ -188,6 +190,7 @@ class RegistrationsController extends Controller
             $actionInstruction = '';
             $c4dProjectWithAssets = '';
             $frameRanges = [];
+            $allocatedToUsers = [];
 
             Log::info('In awake user for email: ' . $request->get(self::EMAIL));
 
@@ -198,23 +201,13 @@ class RegistrationsController extends Controller
 
                 // Here we check to see if any earlier requests from this user have been rendered;
                 // the slave user can then pull down the results
-                $results = DB::table('render_details as rd')
-                    ->select(
-                        'rd.id','rd.status','rd.from','rd.to',
-                        'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat'
-                    )
-                    ->join('renders as r', 'r.id', '=', 'rd.render_id')
-                    ->where('r.submitted_by_user_id', '=', $user->id)
-                    ->where('r.status', '=', Render::COMPLETE)
-                    ->orderBy('render_id', 'ASC')
-                    ->orderBy('rd.id', 'ASC')
-                    ->get();
+                $results = RenderDetail::getCompletedRenderDetails($user->id);
 
                 if (null == $results) {
                     $message = "No renders are currently available for download";
                     Log::info($message);
                 } else {
-                    Log::info('Render details available for downloads: ' . print_r($result, true));
+                    Log::info('Render details available for downloads: ' . count($result));
                     foreach ($results as $result) {
                         // Render detail now set to returned
                         $renderDetail = RenderDetail::find($result->id);
@@ -226,8 +219,6 @@ class RegistrationsController extends Controller
 
                         $c4dProjectWithAssets = $result->c4dProjectWithAssets;
                         $frameRanges[] = "{$result->from}-{$result->to}";
-
-//                        Log::info('Returning result: ' . print_r($result, true));
                     }
                     // Render now set to returned and it is fully processed
                     $render = Render::find($result->render_id);
@@ -240,6 +231,27 @@ class RegistrationsController extends Controller
                     $actionInstruction = self::AI_DO_DOWNLOAD;
                 }
 
+                if (self::AI_DO_DOWNLOAD != $actionInstruction) {
+                    // We are not instructing the slave to do downloads, so check for outstanding renders
+                    $results = RenderDetail::getOutstandingRenderDetails($user->id);
+                    // Return the data so that it can be displayed to the slave user
+                    foreach ($results as $result) {
+                        // No change of status, just put the data together
+                        $c4dProjectWithAssets = $result->c4dProjectWithAssets;
+                        $frameRanges[] = "{$result->from}-{$result->to}";
+                        if (0 < $result->allocated_to_user_id) {
+                            $allocatedUser = User::where('id', $result->allocated_to_user_id) -> first();
+                            if ($allocatedUser) {
+                                $allocatedToUsers[] = $allocatedUser->getName();
+                            }
+                        } else {
+                            $allocatedToUsers[] = "None";
+                        }
+                    }
+
+                    $actionInstruction = self::AI_DO_DISPLAY_OUTSTANDING;
+                }
+
                 $result = 'OK';
 
             } else {
@@ -249,15 +261,16 @@ class RegistrationsController extends Controller
                 $result = 'Error';
             }
 
-            $received = [
+            $returnData = [
                 self::ACTIONINSTRUCTION => $actionInstruction,
                 self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
                 self::FRAMERANGES => $frameRanges,
+                self::ALLOCATEDTOUSERS => $allocatedToUsers,
                 "result" => $result,
                 "message" => $message,
             ];
 
-            return $received;   // Gets converted to json
+            return $returnData;   // Gets converted to json
 
         } catch(\Exception $exception) {
             Log::info('Error exception: ' . $exception->getMessage());
@@ -326,12 +339,12 @@ class RegistrationsController extends Controller
                 $result = 'Error';
             }
 
-            $received = [
+            $returnData = [
                 "result" => $result,
                 "message" => $message,
             ];
 
-            return $received;   // Gets converted to json
+            return $returnData;   // Gets converted to json
 
         } catch(\Exception $exception) {
             Log::info('Error: ' . $exception->getMessage());
@@ -357,12 +370,12 @@ class RegistrationsController extends Controller
 
             $result = 'OK';
 
-            $received = [
+            $returnData = [
                 "message" => $message,
                 "result" => $result
             ];
 
-            return $received;   // Gets converted to json
+            return $returnData;   // Gets converted to json
 
         } catch(\Exception $exception) {
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
@@ -409,12 +422,12 @@ class RegistrationsController extends Controller
             }
             $result = 'OK';
 
-            $received = [
+            $returnData = [
                 "message" => $message,
                 "result" => $result
             ];
 
-            return $received;   // Gets converted to json
+            return $returnData;   // Gets converted to json
 
         } catch(\Exception $exception) {
             Log::info('Error: ' . $exception->getMessage());
