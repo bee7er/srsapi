@@ -9,6 +9,8 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
@@ -50,6 +52,29 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     public static $statuses = ['available', 'unavailable', 'rendering'];
+
+    /**
+     * Set the api_token after a valid registration.
+     */
+    public function setApiToken()
+    {
+        $this->api_token = Str::random(80);
+    }
+
+    /**
+     * Check the api_token has been provided and is valid
+     *
+     * @param $apiToken
+     */
+    public function checkApiToken($apiToken)
+    {
+        if (!isset($apiToken)) {
+            throw new \Exception('API authentication not provided');
+        }
+        if ($apiToken !== $this->api_token) {
+            throw new \Exception('API authentication is invalid');
+        }
+    }
 
     /**
      * Build and return user name

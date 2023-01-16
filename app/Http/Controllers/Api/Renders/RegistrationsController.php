@@ -20,6 +20,7 @@ class RegistrationsController extends Controller
     // Parameters
     const ACTIONINSTRUCTION = "actionInstruction";
     const ALLOCATEDTOUSERS = "allocatedToUsers";
+    const APITOKEN = "apiToken";
     const AVAILABILITY = "availability";
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const CUSTOMFRAMERANGE = "customFrameRange";
@@ -44,14 +45,15 @@ class RegistrationsController extends Controller
      */
     public function register(Request $request)
     {
+        $message = "Registration received OK";
+        $result = 'OK';
         try {
-            $message = "Registration received OK";
-            $result = 'OK';
-
             Log::info('In register user for email: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
+                $user->checkApiToken($request->get(self::APITOKEN));
+
                 // Update user with availability
                 $user->status     = ($request->get(self::AVAILABILITY) == self::AVAILABILITY_AVAILABLE ? 'available': 'unavailable');
                 $user->save();
@@ -63,20 +65,20 @@ class RegistrationsController extends Controller
                 $result = 'Error';
             }
 
-            $returnData = [
-                "email" => $request->get(self::EMAIL),
-                "availability" => $request->get(self::AVAILABILITY),
-                "result" => $result,
-                "message" => $message,
-            ];
-
-            return $returnData;
-
         } catch(\Exception $exception) {
-            Log::info('Exception: ' . $exception->getMessage());
-
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+            $result = 'Error';
+            $message = $exception->getMessage();
+            Log::info('Exception: ' . $message);
         }
+
+        $returnData = [
+            "email" => $request->get(self::EMAIL),
+            "availability" => $request->get(self::AVAILABILITY),
+            "result" => $result,
+            "message" => $message,
+        ];
+
+        return $returnData;
     }
 
     /**
@@ -101,6 +103,7 @@ class RegistrationsController extends Controller
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
+                $user->checkApiToken($request->get(self::APITOKEN));
 
                 Log::info('Got user for email: ' . $request->get(self::EMAIL));
 
@@ -157,23 +160,24 @@ class RegistrationsController extends Controller
                 $result = 'Error';
             }
 
-            $returnData = [
-                self::ACTIONINSTRUCTION => $actionInstruction,
-                self::RENDERDETAILID => $renderDetailId,
-                self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
-                self::FROM => $from,
-                self::TO => $to,
-                self::OUTPUTFORMAT => $outputFormat,
-                "result" => $result,
-                "message" => $message,
-            ];
-
-            return $returnData;   // Gets converted to json
-
         } catch(\Exception $exception) {
-            Log::info('Error: ' . $exception->getMessage());
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+            $result = 'Error';
+            $message = $exception->getMessage();
+            Log::info('Error: ' . $message);
         }
+
+        $returnData = [
+            self::ACTIONINSTRUCTION => $actionInstruction,
+            self::RENDERDETAILID => $renderDetailId,
+            self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
+            self::FROM => $from,
+            self::TO => $to,
+            self::OUTPUTFORMAT => $outputFormat,
+            "result" => $result,
+            "message" => $message,
+        ];
+
+        return $returnData;   // Gets converted to json
     }
 
     /**
@@ -196,6 +200,8 @@ class RegistrationsController extends Controller
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
+                $user->checkApiToken($request->get(self::APITOKEN));
+
                 // Heart beat from the slaves, it signals that the slave is active
                 Log::info('Got user for email: ' . $request->get(self::EMAIL));
 
@@ -207,7 +213,11 @@ class RegistrationsController extends Controller
                     $message = "No renders are currently available for download";
                     Log::info($message);
                 } else {
-                    Log::info('Render details available for downloads: ' . count($result));
+                    $count = 1;
+                    if (is_array($results)) {
+                        $count = count($results);
+                    }
+                    Log::info('Render details available for downloads: ' . $count);
                     foreach ($results as $result) {
                         // Render detail now set to returned
                         $renderDetail = RenderDetail::find($result->id);
@@ -261,21 +271,22 @@ class RegistrationsController extends Controller
                 $result = 'Error';
             }
 
-            $returnData = [
-                self::ACTIONINSTRUCTION => $actionInstruction,
-                self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
-                self::FRAMERANGES => $frameRanges,
-                self::ALLOCATEDTOUSERS => $allocatedToUsers,
-                "result" => $result,
-                "message" => $message,
-            ];
-
-            return $returnData;   // Gets converted to json
-
         } catch(\Exception $exception) {
-            Log::info('Error exception: ' . $exception->getMessage());
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+            $result = 'Error';
+            $message = $exception->getMessage() . ' on line ' . $exception->getLine();
+            Log::info('Error exception: ' . $message);
         }
+
+        $returnData = [
+            self::ACTIONINSTRUCTION => $actionInstruction,
+            self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
+            self::FRAMERANGES => $frameRanges,
+            self::ALLOCATEDTOUSERS => $allocatedToUsers,
+            "result" => $result,
+            "message" => $message,
+        ];
+
+        return $returnData;   // Gets converted to json
     }
 
     /**
@@ -293,6 +304,8 @@ class RegistrationsController extends Controller
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
+                $user->checkApiToken($request->get(self::APITOKEN));
+
                 $renderResults = DB::table('render_details as rd')
                     ->select(
                         'rd.id','rd.status as detail_status','rd.allocated_to_user_id','rd.from','rd.to',
@@ -339,17 +352,18 @@ class RegistrationsController extends Controller
                 $result = 'Error';
             }
 
-            $returnData = [
-                "result" => $result,
-                "message" => $message,
-            ];
-
-            return $returnData;   // Gets converted to json
-
         } catch(\Exception $exception) {
-            Log::info('Error: ' . $exception->getMessage());
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+            $result = 'Error';
+            $message = $exception->getMessage();
+            Log::info('Error: ' . $message);
         }
+
+        $returnData = [
+            "result" => $result,
+            "message" => $message,
+        ];
+
+        return $returnData;   // Gets converted to json
     }
 
 
@@ -370,16 +384,18 @@ class RegistrationsController extends Controller
 
             $result = 'OK';
 
-            $returnData = [
-                "message" => $message,
-                "result" => $result
-            ];
-
-            return $returnData;   // Gets converted to json
-
         } catch(\Exception $exception) {
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+            $result = 'Error';
+            $message = $exception->getMessage();
+            Log::info('Error: ' . $message);
         }
+
+        $returnData = [
+            "message" => $message,
+            "result" => $result
+        ];
+
+        return $returnData;   // Gets converted to json
     }
 
     /**
@@ -422,17 +438,18 @@ class RegistrationsController extends Controller
             }
             $result = 'OK';
 
-            $returnData = [
-                "message" => $message,
-                "result" => $result
-            ];
-
-            return $returnData;   // Gets converted to json
-
         } catch(\Exception $exception) {
-            Log::info('Error: ' . $exception->getMessage());
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+            $result = 'Error';
+            $message = $exception->getMessage();
+            Log::info('Error: ' . $message);
         }
+
+        $returnData = [
+            "message" => $message,
+            "result" => $result
+        ];
+
+        return $returnData;   // Gets converted to json
     }
 
 }

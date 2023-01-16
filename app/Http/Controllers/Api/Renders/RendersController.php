@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class RendersController extends Controller
 {
     // Parameters
+    const APITOKEN = "apiToken";
     const EMAIL = "email";
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const OUTPUTFORMAT = "outputFormat";
@@ -61,6 +62,8 @@ class RendersController extends Controller
 
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
+                $user->checkApiToken($request->get(self::APITOKEN));
+
                 // Create a new Render record
                 $render = new Render();
                 $render->submitted_by_user_id = $user->id;
@@ -91,25 +94,26 @@ class RendersController extends Controller
                 $result = 'Error';
             }
 
-            $returnData = [
-                self::EMAIL => $request->get(self::EMAIL),
-                self::C4DPROJECTWITHASSETS => $request->get(self::C4DPROJECTWITHASSETS),
-                self::OUTPUTFORMAT => $request->get(self::OUTPUTFORMAT),
-                self::OVERRIDESETTINGS => $request->get(self::OVERRIDESETTINGS),
-                self::CUSTOMFRAMERANGES => $request->get(self::CUSTOMFRAMERANGES),
-                self::FROM => $request->get(self::FROM),
-                self::TO => $request->get(self::TO),
-                self::RENDERID => $renderId,
-                "message" => $message,
-                "result" => $result
-            ];
-
-            return $returnData;   // Gets converted to json
-
         } catch(\Exception $exception) {
-            Log::info('Error: ' . $exception->getMessage());
-            throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+            $result = 'Error';
+            $message = $exception->getMessage();
+            Log::info('Error: ' . $message);
         }
+
+        $returnData = [
+            self::EMAIL => $request->get(self::EMAIL),
+            self::C4DPROJECTWITHASSETS => $request->get(self::C4DPROJECTWITHASSETS),
+            self::OUTPUTFORMAT => $request->get(self::OUTPUTFORMAT),
+            self::OVERRIDESETTINGS => $request->get(self::OVERRIDESETTINGS),
+            self::CUSTOMFRAMERANGES => $request->get(self::CUSTOMFRAMERANGES),
+            self::FROM => $request->get(self::FROM),
+            self::TO => $request->get(self::TO),
+            self::RENDERID => $renderId,
+            "message" => $message,
+            "result" => $result
+        ];
+
+        return $returnData;   // Gets converted to json
     }
 
     /**

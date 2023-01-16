@@ -75,6 +75,7 @@ class UsersController extends Controller
             $user->surname    = Input::get('surname');
             $user->email      = Input::get('email');
             $user->password   = Input::get('password');
+            $user->setApiToken();
             $user->save();
 
             Session::flash('flash_message', 'Successfully created a new user');

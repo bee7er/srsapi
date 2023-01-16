@@ -35,6 +35,11 @@
                             </div>
 
                             <div class="form-group">
+                                {!! Form::label('api_token', 'API token', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('api_token', $user->api_token, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
+                            </div>
+
+                            <div class="form-group">
                                 {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
                                 <select name="status" disabled="disabled">
                                     @foreach ($statuses as $status)

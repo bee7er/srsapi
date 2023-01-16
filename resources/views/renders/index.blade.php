@@ -4,6 +4,7 @@
 
     <?php
     use App\RenderDetail;
+    use Illuminate\Support\Str;
     ?>
 
     <div class="content">
@@ -30,11 +31,15 @@
                                 <div class="form-group">
                                     {!! Form::label('includeReturned', 'Include returned renders: ', ['class' => 'col-md-4
                                     control-label srs-label']) !!}
-                                    <input type="checkbox" name="includeReturned" id="includeReturned" class="col-md-1" value="1" @if (isset($includeReturned)) checked="checked" @endif />
+                                    <input type="checkbox" name="includeReturned" id="includeReturned" class="col-md-1" value="1" @if (isset($includeReturned)) checked="checked" @endif onchange="this.form.submit()" />
                                 </div>
 
                                 <div class="form-group">
                                     {!! Form::submit('Refresh', ['class' => 'col-md-2 col-md-offset-4 btn btn-primary']) !!}
+                                </div>
+
+                                <div class="form-group">
+                                    {!! Str::random(80) !!}
                                 </div>
 
                                 {!! Form::close() !!}
