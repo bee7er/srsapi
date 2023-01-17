@@ -18,6 +18,9 @@ class User extends Model implements AuthenticatableContract,
 {
     use Authenticatable, Authorizable, CanResetPassword;
 
+    const  ADMIN = 'admin';
+    const  USER = 'user';
+
     /**
      * The database table used by the model.
      *
@@ -81,5 +84,12 @@ class User extends Model implements AuthenticatableContract,
      */
     public function getName() {
         return $this->first_name . ' ' . $this->surname;
+    }
+
+    /**
+     * Returns a boolean which indicates whether the user ia n administrator
+     */
+    public function isAdmin() {
+        return (self::ADMIN === $this->role);
     }
 }

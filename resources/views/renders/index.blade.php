@@ -21,7 +21,9 @@
                                 <div class="form-group" style="margin-top: 5px;">
                                     {!! Form::label('selectedUserId', 'Select user: ', ['class' => 'col-md-4 control-label srs-label']) !!}
                                     <select id="selectedUserId" name="selectedUserId" class="col-md-4" onchange="this.form.submit()">
-                                        <option value="0" @if (0 == $selectedUserId) selected @endif>All</option>
+                                        @if (Auth::user()->isAdmin())
+                                            <option value="0" @if (0 == $selectedUserId) selected @endif>All</option>
+                                        @endif
                                         @foreach ($users as $optionUser)
                                             <option value="{!! $optionUser->id !!}" @if ($optionUser->id == $selectedUserId) selected @endif>{!! $optionUser->first_name . ' ' . $optionUser->surname !!}</option>
                                         @endforeach
@@ -36,10 +38,6 @@
 
                                 <div class="form-group">
                                     {!! Form::submit('Refresh', ['class' => 'col-md-2 col-md-offset-4 btn btn-primary']) !!}
-                                </div>
-
-                                <div class="form-group">
-                                    {!! Str::random(80) !!}
                                 </div>
 
                                 {!! Form::close() !!}

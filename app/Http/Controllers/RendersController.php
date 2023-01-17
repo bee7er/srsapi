@@ -44,7 +44,12 @@ class RendersController extends Controller
             if (0 != $selectedUserId) {
                 $user = User::where('id', $selectedUserId)->first();
             }
-            $users =  $builder = DB::table('users as u')
+            $builder = DB::table('users as u');
+            if (!Auth::user()->isAdmin()) {
+                // Not admin so only show the logged in user in the selection box
+                $builder->where('u.id', Auth::user()->id);
+            }
+            $users = $builder
                 ->orderBy('u.surname', 'u.first_name')
                 ->get();
 

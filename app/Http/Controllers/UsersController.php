@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Http\Requests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -28,6 +29,9 @@ class UsersController extends Controller
      */
     public function index()
     {
+        if (!Auth::user()->isAdmin()) {
+            return redirect('/');
+        }
         // Get all the current users
         $users = User::all()->sortBy(['surname','first_name']);
 

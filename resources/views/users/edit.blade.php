@@ -41,7 +41,10 @@
                             </div>
 
                             <div class="form-group">
-                                {!! Form::submit('Delete', ['class' => 'col-md-2 col-md-offset-4 btn btn-primary']) !!}
+                                {{--Delete only for admin, and you can't delete yourself--}}
+                                @if (Auth::user()->isAdmin() && Auth::user()->id != $user->id)
+                                    {!! Form::submit('Delete', ['class' => 'col-md-2 col-md-offset-4 btn btn-primary']) !!}
+                                @endif
 
                                 {!! Form::submit('Update', ['class' => 'col-md-2 col-md-offset-2 btn btn-primary']) !!}
                             </div>

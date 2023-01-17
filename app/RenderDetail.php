@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class RenderDetail extends Model
@@ -32,6 +33,12 @@ class RenderDetail extends Model
      */
     public static function getSubmisionsAndRenders($selectedUserId = 0, $includeReturned = 0, $renderId = 0)
     {
+        // Get the currently logged in user
+        $user = Auth::user();
+        if (!$user->isAdmin()) {
+            // Not admin so only show the logged in user in the selection box
+            $selectedUserId = $user->id;
+        }
         // Get all the current renders
         $builder = DB::table('render_details as rd')
             ->select(
