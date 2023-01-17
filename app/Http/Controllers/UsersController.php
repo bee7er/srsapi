@@ -6,6 +6,7 @@ use App\User;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -35,6 +36,7 @@ class UsersController extends Controller
         // Get all the current users
         $users = User::all()->sortBy(['surname','first_name']);
 
+
         return view('users.index', compact('users'));
     }
 
@@ -45,9 +47,13 @@ class UsersController extends Controller
      */
     public function create()
     {
+        if (!Auth::user()->isAdmin()) {
+            return redirect('/');
+        }
         $statuses = User::$statuses;
+        $roles = User::ROLES;
 
-        return view('users.create', compact('statuses'));
+        return view('users.create', compact('statuses', 'roles'));
     }
 
     /**
@@ -58,6 +64,9 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Auth::user()->isAdmin()) {
+            return redirect('/');
+        }
         // Read more on validation at http://laravel.com/docs/validation
         $rules = array(
             'first_name'            => 'required',
@@ -75,10 +84,11 @@ class UsersController extends Controller
         } else {
             $user = new User();
             $user->status     = Input::get('status');
+            $user->role     = Input::get('role');
             $user->first_name = Input::get('first_name');
             $user->surname    = Input::get('surname');
             $user->email      = Input::get('email');
-            $user->password   = Input::get('password');
+            $user->password   = Hash::make(Input::get('password'));
             $user->setApiToken();
             $user->save();
 
@@ -113,8 +123,9 @@ class UsersController extends Controller
         //dd('got-='.$id);
         $user = User::where('id', $id)->first();
         $statuses = User::$statuses;
+        $roles = User::ROLES;
 
-        return view('users.edit', compact('user', 'statuses'));
+        return view('users.edit', compact('user', 'statuses', 'roles'));
     }
 
     /**
@@ -147,6 +158,7 @@ class UsersController extends Controller
                     ->withInput(Input::except('password'));
             }
             $user->status     = Input::get('status');
+            $user->role     = Input::get('role');
             $user->first_name = Input::get('first_name');
             $user->surname    = Input::get('surname');
             $user->email      = Input::get('email');
@@ -167,6 +179,9 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
+        if (!Auth::user()->isAdmin()) {
+            return redirect('/');
+        }
         //
         // @TODO finish this off
         dd('not done yet');

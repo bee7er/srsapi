@@ -14,6 +14,17 @@
                             {!! Form::open(['url' => 'users', 'class' => 'form-horizontal']) !!}
 
                             <div class="form-group">
+                                {!! Form::label('role', 'Role', ['class' => 'col-md-4 control-label']) !!}
+                                <select name="role">
+                                    @foreach ($roles as $role)
+                                        <option value="{{ $role }}" }}>
+                                            {{ $role }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group">
                                 {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
                                 {!! Form::text('first_name', null, ['class' => 'col-md-6']) !!}
                             </div>
