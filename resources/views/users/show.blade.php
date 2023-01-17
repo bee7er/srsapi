@@ -19,10 +19,12 @@
                                 {!! Form::text('id', $user->id, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
                             </div>
 
-                            <div class="form-group">
-                                {!! Form::label('role', 'Role', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('role', $user->role, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
-                            </div>
+                            @if (Auth::user()->isAdmin())
+                                <div class="form-group">
+                                    {!! Form::label('role', 'Role', ['class' => 'col-md-4 control-label']) !!}
+                                    {!! Form::text('role', $user->role, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
+                                </div>
+                            @endif
 
                             <div class="form-group">
                                 {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
