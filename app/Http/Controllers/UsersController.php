@@ -158,7 +158,7 @@ class UsersController extends Controller
                     ->withInput(Input::except('password'));
             }
             $user->status     = Input::get('status');
-            $user->role     = Input::get('role');
+            $user->role     = (Input::get('role') ? : $user->role);
             $user->first_name = Input::get('first_name');
             $user->surname    = Input::get('surname');
             $user->email      = Input::get('email');
