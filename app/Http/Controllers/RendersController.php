@@ -53,7 +53,7 @@ class RendersController extends Controller
                 ->orderBy('u.surname', 'u.first_name')
                 ->get();
 
-            list($submissions, $renders) = RenderDetail::getSubmisionsAndRenders($selectedUserId, $includeReturned);
+            list($submissions, $renders) = RenderDetail::getSubmissionsAndRenders($selectedUserId, $includeReturned);
 
         } catch(Exception $e) {
             Session::flash('flash_message', 'Error gathering render data: ' . $e->getMessage());

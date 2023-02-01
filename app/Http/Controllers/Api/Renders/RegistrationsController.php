@@ -30,6 +30,7 @@ class RegistrationsController extends Controller
     const OUTPUTFORMAT = "outputFormat";
     const OVERRIDESETTINGS = "overrideSettings";
     const RENDERDETAILID = "renderDetailId";
+    const SUBMISSIONSANDRENDERS = "submissionsAndRenders";
     const TO = "to";
 
     # Action instruction
@@ -193,6 +194,7 @@ class RegistrationsController extends Controller
             $result = 'Error';
             $actionInstruction = '';
             $c4dProjectWithAssets = '';
+            $submissionsAndRenders = '';
             $frameRanges = [];
             $allocatedToUsers = [];
 
@@ -243,21 +245,10 @@ class RegistrationsController extends Controller
 
                 if (self::AI_DO_DOWNLOAD != $actionInstruction) {
                     // We are not instructing the slave to do downloads, so check for outstanding renders
-                    $results = RenderDetail::getOutstandingRenderDetails($user->id);
-                    // Return the data so that it can be displayed to the slave user
-                    foreach ($results as $result) {
-                        // No change of status, just put the data together
-                        $c4dProjectWithAssets = $result->c4dProjectWithAssets;
-                        $frameRanges[] = "{$result->from}-{$result->to}";
-                        if (0 < $result->allocated_to_user_id) {
-                            $allocatedUser = User::where('id', $result->allocated_to_user_id) -> first();
-                            if ($allocatedUser) {
-                                $allocatedToUsers[] = $allocatedUser->getName();
-                            }
-                        } else {
-                            $allocatedToUsers[] = "None";
-                        }
-                    }
+                    // TODO Is this used?
+                    list($frameRanges, $allocatedToUsers) = RenderDetail::getOutstandingRenderDetails($user->id);
+                    // Get both submissions and renders as a displayable string
+                    $submissionsAndRenders = RenderDetail::getSubmissionsAndRendersAsHTML($user->id);
 
                     $actionInstruction = self::AI_DO_DISPLAY_OUTSTANDING;
                 }
@@ -282,6 +273,7 @@ class RegistrationsController extends Controller
             self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
             self::FRAMERANGES => $frameRanges,
             self::ALLOCATEDTOUSERS => $allocatedToUsers,
+            self::SUBMISSIONSANDRENDERS => $submissionsAndRenders,
             "result" => $result,
             "message" => $message,
         ];

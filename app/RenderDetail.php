@@ -31,14 +31,8 @@ class RenderDetail extends Model
      * @param int $renderId
      * @return array
      */
-    public static function getSubmisionsAndRenders($selectedUserId = 0, $includeReturned = 0, $renderId = 0)
+    public static function getSubmissionsAndRenders($selectedUserId = 0, $includeReturned = 0, $renderId = 0)
     {
-        // Get the currently logged in user
-        $user = Auth::user();
-        if (!$user->isAdmin()) {
-            // Not admin so only show the logged in user in the selection box
-            $selectedUserId = $user->id;
-        }
         // Get all the current renders
         $builder = DB::table('render_details as rd')
             ->select(
@@ -96,6 +90,46 @@ class RenderDetail extends Model
     }
 
     /**
+     * Returns submission and render details in an HTML string
+     *
+     * @param $submittedByUserId
+     * @return string
+     */
+    public static function getSubmissionsAndRendersAsHTML($submittedByUserId)
+    {
+        list($submissions, $renders) = self::getSubmissionsAndRenders($submittedByUserId);
+        $html = '<table style="font-size:11px;width:100%;">';
+        $html .= '<tr><td colspan="4" style="font-size:14px;font-weight:bold;">Submitted by You</td></tr>';
+        $html .= "<tr><th>Project</th><th>Chunk</th><th>Allocated to</th><th>Status</th></tr>";
+
+        if (is_array($submissions) && 0 < count($submissions)) {
+            foreach ($submissions as $submission) {
+                // Build a row with this information
+                $html .= "<tr><th>{$submission->c4dProjectWithAssets}</th><th>{$submission->from} to {$submission->to}</th><th>{$submission->first_name} {$submission->surname}</th><th>{$submission->detail_status}</th></tr>";
+            }
+        } else {
+            $html .= '<tr><td colspan="4">Submitted by You</td></tr>';
+        }
+
+        $html .= '<tr><td colspan="4" style="font-size:10px;">&nbsp;</td></tr>';
+        $html .= '<tr><td colspan="4" style="font-size:14px;font-weight:bold;">Allocated to You</td></tr>';
+        $html .= "<tr><th>Project</th><th>Chunk</th><th>Submitted by</th><th>Status</th></tr>";
+
+        if (is_array($renders) && 0 < count($renders)) {
+            foreach ($renders as $render) {
+                // Build a row with this information
+                $html .= "<tr><th>{$render->c4dProjectWithAssets}</th><th>{$render->from} to {$render->to}</th><th>{$render->first_name} {$render->surname}</th><th>{$render->detail_status}</th></tr>";
+            }
+        } else {
+            $html .= '<tr><td colspan="4">Submitted by You</td></tr>';
+        }
+
+        $html .= '</table>';
+
+        return $html;
+    }
+
+    /**
      * Returns completed render details which have not been downloaded (returned)
      *
      * @param $submittedByUserId
@@ -122,7 +156,7 @@ class RenderDetail extends Model
      * @param $submittedByUserId
      * @return mixed
      */
-    public static function getOutstandingRenderDetails($submittedByUserId)
+    public static function getOutstandingRenders($submittedByUserId)
     {
         return DB::table('render_details as rd')
             ->select(
@@ -135,5 +169,35 @@ class RenderDetail extends Model
             ->orderBy('render_id', 'ASC')
             ->orderBy('rd.id', 'ASC')
             ->get();
+    }
+
+    /**
+     * Returns completed render details which have not been downloaded (returned)
+     *
+     * @param $submittedByUserId
+     * @return mixed
+     */
+    public static function getOutstandingRenderDetails($submittedByUserId)
+    {
+        $frameRanges = $allocatedToUsers = [];
+
+        $outstandingRenders = self::getOutstandingRenders($submittedByUserId);
+        if (is_array($outstandingRenders) && 0 < count($outstandingRenders)) {
+            foreach ($outstandingRenders as $outstandingRender) {
+                // No change of status, just put the data together
+                $c4dProjectWithAssets = $outstandingRender->c4dProjectWithAssets;
+                $frameRanges[] = "{$outstandingRender->from}-{$outstandingRender->to}";
+                if (0 < $outstandingRender->allocated_to_user_id) {
+                    $allocatedUser = User::where('id', $outstandingRender->allocated_to_user_id)->first();
+                    if ($allocatedUser) {
+                        $allocatedToUsers[] = $allocatedUser->getName();
+                    }
+                } else {
+                    $allocatedToUsers[] = "None";
+                }
+            }
+        }
+
+        return [$frameRanges, $allocatedToUsers];
     }
 }
