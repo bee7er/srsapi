@@ -77,9 +77,15 @@ class RendersController extends Controller
             if (!$renderDetail) {
                 throw new Exception("Could not find render detail with id $renderDetailsId");
             }
+            // Save the user id so we can update user
+            $allocatedToUserId = $renderDetail->allocated_to_user_id;
+            // Reassign the detail, by setting it to be picked up by the next available slave
             $renderDetail->allocated_to_user_id = 0;
             $renderDetail->status = RenderDetail::READY;
             $renderDetail->save();
+
+            // User's data has changed for this render, and the original user, too
+            Render::dataHasChanged($renderDetail->render_id, $allocatedToUserId);
 
             Session::flash('flash_message', 'Successfully updated render detail');
             Session::flash('flash_type', 'alert-success');

@@ -57,7 +57,10 @@ class RegistrationsController extends Controller
 
                 // Update user with availability
                 $user->status     = ($request->get(self::AVAILABILITY) == self::AVAILABILITY_AVAILABLE ? 'available': 'unavailable');
+                // Treat this as a data changed event so that the user gets the latest data
+                $user->data_changed = true;
                 $user->save();
+
                 Log::info('User saved OK');
             } else {
                 // User can only be added by the administrator
@@ -144,6 +147,9 @@ class RegistrationsController extends Controller
                     $renderDetail->allocated_to_user_id = $user->id;
                     $renderDetail->save();
 
+                    // User's data has changed for this render
+                    Render::dataHasChanged($render->id, $user->id);
+
                     $c4dProjectWithAssets = $result->c4dProjectWithAssets;
                     $from = $result->from;
                     $to = $result->to;
@@ -220,37 +226,57 @@ class RegistrationsController extends Controller
                         $count = count($results);
                     }
                     Log::info('Render details available for downloads: ' . $count);
-                    foreach ($results as $result) {
-                        // Render detail now set to returned
-                        $renderDetail = RenderDetail::find($result->id);
-                        if (!$renderDetail) {
-                            throw new \Exception("Could not find render detail record with id '{$result->id}'");
-                        }
-                        $renderDetail->status = RenderDetail::RETURNED;
-                        $renderDetail->save();
+                    if ($results && 0 < count($results)) {
+                        $renderIdAry = [];
 
-                        $c4dProjectWithAssets = $result->c4dProjectWithAssets;
-                        $frameRanges[] = "{$result->from}-{$result->to}";
+                        foreach ($results as $result) {
+                            // Render detail now set to returned
+                            $renderDetail = RenderDetail::find($result->id);
+                            if (!$renderDetail) {
+                                throw new \Exception("Could not find render detail record with id '{$result->id}'");
+                            }
+                            $renderDetail->status = RenderDetail::RETURNED;
+                            $renderDetail->save();
+
+                            $c4dProjectWithAssets = $result->c4dProjectWithAssets;
+                            $frameRanges[] = "{$result->from}-{$result->to}";
+                            // NB We only want one record for each render
+                            $renderIdAry[$renderDetail->renderId] = $renderDetail->renderId;
+
+                            // User's data has changed for this render, and the original user, too
+                            Render::dataHasChanged($renderDetail->render_id, $renderDetail->allocated_to_user_id);
+                        }
+
+                        if ($renderIdAry && 0 < count($renderIdAry)) {
+                            foreach ($renderIdAry as $renderId) {
+                                // Render now set to returned and it is fully processed
+                                $render = Render::find($renderId);
+                                if (!$render) {
+                                    throw new \Exception("Could not find render record with id '{$renderId}'");
+                                }
+                                $render->status = Render::RETURNED;
+                                $render->save();
+                            }
+                        }
                     }
-                    // Render now set to returned and it is fully processed
-                    $render = Render::find($result->render_id);
-                    if (!$render) {
-                        throw new \Exception("Could not find render record with id '{$result->render_id}'");
-                    }
-                    $render->status = Render::RETURNED;
-                    $render->save();
+
 
                     $actionInstruction = self::AI_DO_DOWNLOAD;
                 }
 
                 if (self::AI_DO_DOWNLOAD != $actionInstruction) {
-                    // We are not instructing the slave to do downloads, so check for outstanding renders
-                    // TODO Is this used?
-                    list($frameRanges, $allocatedToUsers) = RenderDetail::getOutstandingRenderDetails($user->id);
-                    // Get both submissions and renders as a displayable string
-                    $submissionsAndRenders = RenderDetail::getSubmissionsAndRendersAsHTML($user->id);
+                    // We are not instructing the slave to do downloads, so if data has changed for this
+                    // user then check for outstanding renders
+                    if ($user->data_changed) {
+                        // Get both submissions and renders as a displayable string
+                        $submissionsAndRenders = RenderDetail::getSubmissionsAndRendersAsHTML($user->id);
 
-                    $actionInstruction = self::AI_DO_DISPLAY_OUTSTANDING;
+                        $actionInstruction = self::AI_DO_DISPLAY_OUTSTANDING;
+
+                        // Only display the user's data once, until the next time it has changed
+                        $user->data_changed = false;
+                        $user->save();
+                    }
                 }
 
                 $result = 'OK';
@@ -404,30 +430,39 @@ class RegistrationsController extends Controller
 
             Log::info('In complete for email: ' . $request->get(self::EMAIL));
             Log::info('In complete for render details id: ' . $request->get(self::RENDERDETAILID));
-            // Update the detail record to DONE
-            $renderDetailId = $request->get(self::RENDERDETAILID);
-            $renderDetail = RenderDetail::find($renderDetailId);
-            if (!$renderDetail) {
-                throw new \Exception("Could not find render detail record with id '{$renderDetailId}'");
-            }
-            $renderDetail->status = RenderDetail::DONE;
-            $renderDetail->save();
-            // If all details are DONE then the render is COMPLETE
-            $result = DB::table('render_details as rd')
-                ->select('rd.id','rd.status')
-                ->where('rd.render_id', $renderDetail->render_id)
-                ->where('rd.status', '!=', RenderDetail::DONE)
-                ->get();
-            if (0 >= count($result)) {
-                $render = Render::find($renderDetail->render_id);
-                if (!$render) {
-                    throw new \Exception("Could not find render record with id '{$renderDetail->render_id}'");
+            $user = User::where('email', $request->get(self::EMAIL))->first();
+            if ($user) {
+                $user->checkApiToken($request->get(self::APITOKEN));
+
+                // Update the detail record to DONE
+                $renderDetailId = $request->get(self::RENDERDETAILID);
+                $renderDetail = RenderDetail::find($renderDetailId);
+                if (!$renderDetail) {
+                    throw new \Exception("Could not find render detail record with id '{$renderDetailId}'");
                 }
-                $render->status = Render::COMPLETE;
-                $render->completed_at = date('Y-m-d H:i:s');
-                $render->save();
-                Log::info('Render is COMPLETE with id: ' . $renderDetail->render_id);
+                $renderDetail->status = RenderDetail::DONE;
+                $renderDetail->save();
+                // If all details are DONE then the render is COMPLETE
+                $result = DB::table('render_details as rd')
+                    ->select('rd.id', 'rd.status')
+                    ->where('rd.render_id', $renderDetail->render_id)
+                    ->where('rd.status', '!=', RenderDetail::DONE)
+                    ->get();
+                if (0 >= count($result)) {
+                    $render = Render::find($renderDetail->render_id);
+                    if (!$render) {
+                        throw new \Exception("Could not find render record with id '{$renderDetail->render_id}'");
+                    }
+                    $render->status = Render::COMPLETE;
+                    $render->completed_at = date('Y-m-d H:i:s');
+                    $render->save();
+                    Log::info('Render is COMPLETE with id: ' . $renderDetail->render_id);
+                }
+
+                // User's data has changed for this render
+                Render::dataHasChanged($renderDetail->render_id, $renderDetail->allocated_to_user_id);
             }
+
             $result = 'OK';
 
         } catch(\Exception $exception) {
