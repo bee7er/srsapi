@@ -241,7 +241,7 @@ class RegistrationsController extends Controller
                             $c4dProjectWithAssets = $result->c4dProjectWithAssets;
                             $frameRanges[] = "{$result->from}-{$result->to}";
                             // NB We only want one record for each render
-                            $renderIdAry[$renderDetail->renderId] = $renderDetail->renderId;
+                            $renderIdAry[$renderDetail->render_id] = $renderDetail->render_id;
 
                             // User's data has changed for this render, and the original user, too
                             Render::dataHasChanged($renderDetail->render_id, $renderDetail->allocated_to_user_id);
