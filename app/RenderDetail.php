@@ -99,30 +99,41 @@ class RenderDetail extends Model
     {
         list($submissions, $renders) = self::getSubmissionsAndRenders($submittedByUserId);
         $html = '<table style="font-size:11px;width:100%;">';
-        $html .= '<tr><td colspan="4" style="font-size:14px;font-weight:bold;">Submitted by You</td></tr>';
+        $html .= '<tr><td colspan="4" style="font-size:16px;font-weight:bold;">Submitted by You</td></tr>';
         $html .= "<tr><th>Project</th><th>Chunk</th><th>Allocated to</th><th>Status</th></tr>";
+        $entryCount = 0;
 
+        $color = $grey = '#d8d8d8';
+        $blue = '#a6ffff';
         if (is_array($submissions) && 0 < count($submissions)) {
             foreach ($submissions as $submission) {
+                $entryCount++;
                 // Build a row with this information
-                $html .= "<tr><th>{$submission->c4dProjectWithAssets}</th><th>{$submission->from} to {$submission->to}</th><th>{$submission->first_name} {$submission->surname}</th><th>{$submission->detail_status}</th></tr>";
+                $html .= "<tr style=\"background-color: {$color};\"><td>{$submission->c4dProjectWithAssets}</td><td>{$submission->from} to {$submission->to}</td><td>{$submission->first_name} {$submission->surname}</td><td>{$submission->detail_status}</td></tr>";
+                $color = ($color == $grey ? $blue: $grey);
             }
         } else {
-            $html .= '<tr><td colspan="4">Submitted by You</td></tr>';
+            $html .= "<tr style=\"background-color: {$color};\"><td colspan=\"4\">None</td></tr>";
         }
+        $html .= "<tr style=\"background-color: {$color};text-align: right;\"><th colspan=\"4\" style=\"padding-right: 15px;\">Entry count: {$entryCount}</th></tr>";
 
         $html .= '<tr><td colspan="4" style="font-size:10px;">&nbsp;</td></tr>';
-        $html .= '<tr><td colspan="4" style="font-size:14px;font-weight:bold;">Allocated to You</td></tr>';
+        $html .= '<tr><td colspan="4" style="font-size:16px;font-weight:bold;">Allocated to You</td></tr>';
         $html .= "<tr><th>Project</th><th>Chunk</th><th>Submitted by</th><th>Status</th></tr>";
+        $entryCount = 0;
 
+        $color = $grey;
         if (is_array($renders) && 0 < count($renders)) {
             foreach ($renders as $render) {
+                $entryCount++;
                 // Build a row with this information
-                $html .= "<tr><th>{$render->c4dProjectWithAssets}</th><th>{$render->from} to {$render->to}</th><th>{$render->first_name} {$render->surname}</th><th>{$render->detail_status}</th></tr>";
+                $html .= "<tr style=\"background-color: {$color};\"><td>{$render->c4dProjectWithAssets}</td><td>{$render->from} to {$render->to}</td><td>{$render->first_name} {$render->surname}</td><td>{$render->detail_status}</td></tr>";
+                $color = ($color == $grey ? $blue: $grey);
             }
         } else {
-            $html .= '<tr><td colspan="4">Submitted by You</td></tr>';
+            $html .= "<tr style=\"background-color: {$color};\"><td colspan=\"4\">None</td></tr>";
         }
+        $html .= "<tr style=\"background-color: {$color};text-align: right;\"><th colspan=\"4\" style=\"padding-right: 15px;\">Entry count: {$entryCount}</th></tr>";
 
         $html .= '</table>';
 
