@@ -49,7 +49,7 @@
 
                                 <table cellpadding="2" cellspacing="2">
                                     <tr>
-                                        <th colspan="5">Renders Submitted by @if (isset($user)) {!! $user->getName() !!} @else 'All users' @endif</th>
+                                        <th colspan="5" style="font-size: 16px;">Renders Submitted by @if (isset($user)) {!! $user->getName() !!} @else 'All users' @endif</th>
                                     </tr>
                                     <tr>
                                         <th>Render Id</th>
@@ -62,9 +62,13 @@
                                         <th>Action</th>
                                     </tr>
 
+                                    <?php
+                                    $color = $grey = '#d8d8d8';
+                                    $blue = '#a6ffff';
+                                    ?>
                                     @if ($submissions)
                                         @foreach ($submissions as $render)
-                                            <tr>
+                                            <tr style="background-color: {!! $color !!};">
                                                 <td class="srs-id">{!! $render->render_id !!}</td>
                                                 <td class="">{!! $render->c4dProjectWithAssets !!}</td>
                                                 <td class="{!! $render->render_status !!}">{!! $render->render_status !!}</td>
@@ -80,17 +84,18 @@
                                                     @endif
                                                 </td>
                                             </tr>
+                                            <?php $color = ($color == $grey ? $blue: $grey); ?>
                                         @endforeach
                                     @else
-                                        <tr>
-                                            <td colspan="5"><p>No renders found</p></td>
+                                        <tr style="background-color: {!! $color !!};">
+                                            <td colspan="8"><p>No renders found</p></td>
                                         </tr>
                                     @endif
                                 </table>
                             <br>
                                 <table cellpadding="2" cellspacing="2">
                                     <tr>
-                                        <th colspan="5">Renders Allocated to @if (isset($user)) {!! $user->getName() !!} @else 'All users' @endif</th>
+                                        <th colspan="5" style="font-size: 16px;">Renders Allocated to @if (isset($user)) {!! $user->getName() !!} @else 'All users' @endif</th>
                                     </tr>
                                     <tr>
                                         <th>Render Id</th>
@@ -103,9 +108,13 @@
                                         <th>Action</th>
                                     </tr>
 
+                                    <?php
+                                    $color = $grey = '#d8d8d8';
+                                    $blue = '#a6ffff';
+                                    ?>
                                     @if ($renders)
                                         @foreach ($renders as $render)
-                                            <tr>
+                                            <tr style="background-color: {!! $color !!};">
                                                 <td class="srs-id">{!! $render->render_id !!}</td>
                                                 <td class="">{!! $render->c4dProjectWithAssets !!}</td>
                                                 <td class="{!! $render->render_status !!}">{!! $render->render_status !!}</td>
@@ -121,10 +130,11 @@
                                                     @endif
                                                 </td>
                                             </tr>
+                                                <?php $color = ($color == $grey ? $blue: $grey); ?>
                                         @endforeach
                                     @else
-                                        <tr>
-                                            <td colspan="5"><p>No renders found</p></td>
+                                        <tr style="background-color: {!! $color !!};">
+                                            <td colspan="8"><p>No renders found</p></td>
                                         </tr>
                                     @endif
                                 </table>

@@ -38,6 +38,11 @@ class RendersController extends Controller
         try {
             // Check if we are selecting by user
             $selectedUserId = Input::get('selectedUserId');
+            if (!Auth::user()->isAdmin()) {
+                // Not admin, so force selection to current logged in user
+                $selectedUserId = Auth::user()->id;
+            }
+
             $includeReturned = Input::get('includeReturned');
             $user = null;
 
