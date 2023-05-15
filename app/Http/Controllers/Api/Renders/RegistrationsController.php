@@ -31,6 +31,8 @@ class RegistrationsController extends Controller
     const OVERRIDESETTINGS = "overrideSettings";
     const RENDERDETAILID = "renderDetailId";
     const SUBMISSIONSANDRENDERS = "submissionsAndRenders";
+    const SUBMITTEDBYUSERID = "submittedByUserId";
+    const SUBMITTEDBYUSERAPITOKEN = "submittedByUserApiToken";
     const TO = "to";
 
     # Action instruction
@@ -54,6 +56,18 @@ class RegistrationsController extends Controller
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
                 $user->checkApiToken($request->get(self::APITOKEN));
+
+                // Ensure there is a directory here to contain uploaded projects and renders for this user
+                $directory = "uploads/{$request->get(self::APITOKEN)}/projects";
+                if (!file_exists($directory)) {
+                    // create the directory
+                    mkdir($directory, 0755, true);
+                }
+                $directory = "uploads/{$request->get(self::APITOKEN)}/renders";
+                if (!file_exists($directory)) {
+                    // create the directory
+                    mkdir($directory, 0755, true);
+                }
 
                 // Update user with availability
                 $user->status     = ($request->get(self::AVAILABILITY) == self::AVAILABILITY_AVAILABLE ? 'available': 'unavailable');
@@ -102,6 +116,8 @@ class RegistrationsController extends Controller
             $from = 0;
             $to = 0;
             $outputFormat = '';
+            $submittedByUserId = '';
+            $submittedByUserApiToken = '';
 
             Log::info('In available user for email: ' . $request->get(self::EMAIL));
 
@@ -111,14 +127,14 @@ class RegistrationsController extends Controller
 
                 Log::info('Got user for email: ' . $request->get(self::EMAIL));
 
-                // TODO Here we can allocate renders to this slave if there are any
-
                 $result = DB::table('render_details as rd')
                     ->select(
-                        'rd.id','rd.status','rd.from','rd.to',
-                        'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat'
+                        'rd.id', 'rd.status','rd.from','rd.to',
+                        'r.id as render_id','r.status as render_status','r.submitted_by_user_id','r.c4dProjectWithAssets','r.outputFormat',
+                        'u.id as submittedByUserId','u.api_token as submittedByUserApiToken'
                     )
                     ->join('renders as r', 'r.id', '=', 'rd.render_id')
+                    ->join('users as u', 'u.id', '=', 'r.submitted_by_user_id')
                     ->where('r.status', '!=', Render::COMPLETE)
                     ->where('rd.status', RenderDetail::READY)
                     ->orderBy('render_id', 'ASC')
@@ -154,6 +170,8 @@ class RegistrationsController extends Controller
                     $from = $result->from;
                     $to = $result->to;
                     $outputFormat = $result->outputFormat;
+                    $submittedByUserId = $result->submittedByUserId;
+                    $submittedByUserApiToken = $result->submittedByUserApiToken;
 
                     $actionInstruction = self::AI_DO_RENDER;
                 }
@@ -180,6 +198,8 @@ class RegistrationsController extends Controller
             self::FROM => $from,
             self::TO => $to,
             self::OUTPUTFORMAT => $outputFormat,
+            self::SUBMITTEDBYUSERID => $submittedByUserId,
+            self::SUBMITTEDBYUSERAPITOKEN => $submittedByUserApiToken,
             "result" => $result,
             "message" => $message,
         ];
@@ -240,7 +260,7 @@ class RegistrationsController extends Controller
 
                             $c4dProjectWithAssets = $result->c4dProjectWithAssets;
                             $frameRanges[] = "{$result->from}-{$result->to}";
-                            // NB We only want one record for each render
+                            // NB We only want one record for each render, hence using the id as the index
                             $renderIdAry[$renderDetail->render_id] = $renderDetail->render_id;
 
                             // User's data has changed for this render, and the original user, too

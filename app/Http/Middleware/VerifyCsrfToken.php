@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as BaseVerifier;
+use Illuminate\Support\Facades\Log;
 
 class VerifyCsrfToken extends BaseVerifier
 {
@@ -22,4 +24,20 @@ class VerifyCsrfToken extends BaseVerifier
         'projects',
         'results',
     ];
+
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     *
+     * @throws \Illuminate\Session\TokenMismatchException
+     */
+    public function handle($request, Closure $next)
+    {
+        Log::info("*** In VerifyCsrfToken with request: " . $request->getUri());
+
+        return parent::handle($request, $next);
+    }
 }
