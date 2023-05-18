@@ -25,7 +25,7 @@ class RegistrationsController extends Controller
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const CUSTOMFRAMERANGE = "customFrameRange";
     const EMAIL = "email";
-    const FRAMERANGES = "frameRanges";
+    const FRAMEDETAILS = "frameDetails";
     const FROM = "from";
     const OUTPUTFORMAT = "outputFormat";
     const OVERRIDESETTINGS = "overrideSettings";
@@ -221,7 +221,7 @@ class RegistrationsController extends Controller
             $actionInstruction = '';
             $c4dProjectWithAssets = '';
             $submissionsAndRenders = '';
-            $frameRanges = [];
+            $frameDetails = [];
             $allocatedToUsers = [];
 
             Log::info('In awake user for email: ' . $request->get(self::EMAIL));
@@ -259,9 +259,14 @@ class RegistrationsController extends Controller
                             $renderDetail->save();
 
                             $c4dProjectWithAssets = $result->c4dProjectWithAssets;
-                            $frameRanges[] = "{$result->from}-{$result->to}";
                             // NB We only want one record for each render, hence using the id as the index
                             $renderIdAry[$renderDetail->render_id] = $renderDetail->render_id;
+                            // Add an entry for each render that has occured in the range from and to
+                            for ($i=$renderDetail->from; $i<=$renderDetail->to; $i++) {
+                                $filename = explode(".", $c4dProjectWithAssets);
+                                $frameDetails[] = $filename[0] . sprintf("%04d", $i) . "." . $result->outputFormat;
+
+                            }
 
                             // User's data has changed for this render, and the original user, too
                             Render::dataHasChanged($renderDetail->render_id, $renderDetail->allocated_to_user_id);
@@ -317,7 +322,7 @@ class RegistrationsController extends Controller
         $returnData = [
             self::ACTIONINSTRUCTION => $actionInstruction,
             self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
-            self::FRAMERANGES => $frameRanges,
+            self::FRAMEDETAILS => $frameDetails,
             self::ALLOCATEDTOUSERS => $allocatedToUsers,
             self::SUBMISSIONSANDRENDERS => $submissionsAndRenders,
             "result" => $result,

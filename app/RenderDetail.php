@@ -190,25 +190,20 @@ class RenderDetail extends Model
      */
     public static function getOutstandingRenderDetails($submittedByUserId)
     {
-        $frameRanges = $allocatedToUsers = [];
+        $frameDetails = [];
 
         $outstandingRenders = self::getOutstandingRenders($submittedByUserId);
         if (is_array($outstandingRenders) && 0 < count($outstandingRenders)) {
             foreach ($outstandingRenders as $outstandingRender) {
                 // No change of status, just put the data together
                 $c4dProjectWithAssets = $outstandingRender->c4dProjectWithAssets;
-                $frameRanges[] = "{$outstandingRender->from}-{$outstandingRender->to}";
-                if (0 < $outstandingRender->allocated_to_user_id) {
-                    $allocatedUser = User::where('id', $outstandingRender->allocated_to_user_id)->first();
-                    if ($allocatedUser) {
-                        $allocatedToUsers[] = $allocatedUser->getName();
-                    }
-                } else {
-                    $allocatedToUsers[] = "None";
+                for ($i=$outstandingRender->from; $i<=$outstandingRender->to; $i++) {
+                    $frameDetails[] = $c4dProjectWithAssets . sprintf("%03d", $i);
+
                 }
             }
         }
 
-        return [$frameRanges, $allocatedToUsers];
+        return [$frameDetails];
     }
 }
