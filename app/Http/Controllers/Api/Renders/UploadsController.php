@@ -12,8 +12,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UploadsController extends Controller
 {
-    const APITOKEN = "apiToken";
     const EMAIL = "email";
+    const APITOKEN = "apiToken";
+    const SUBMITTEDBYUSERAPITOKEN = "submittedByUserApiToken";
 
     /**
      * Uploads render results from a slave user.
@@ -30,25 +31,8 @@ class UploadsController extends Controller
             if ($user) {
                 $user->checkApiToken($request->get(self::APITOKEN));
 
-                // We need the apiToken of the user who submitted the job, to use their directory for the upload
-                $apiToken = null;
-                // OK, which render is this user processing?
-                $renderDetail = RenderDetail::where('status', RenderDetail::ALLOCATED)
-                    ->where('allocated_to_user_id', $user->id)->first();
-                if ($renderDetail) {
-                    // Get the render record
-                    $render = Render::where('id', $renderDetail->render_id)->first();
-                    if ($render) {
-                        // Find the user that submitted it
-                        $submittedByUser = User::where('id', $render->submitted_by_user_id)->first();
-                        if ($submittedByUser) {
-                            $apiToken = $submittedByUser->api_token;
-                        }
-                    }
-                }
-                if (!$apiToken) {
-                    throw new \Exception("Could not find the submitted by user details");
-                }
+                // We use the apiToken of the user who submitted the job, to use their directory for the upload
+                $submittedByUserApiToken = $request->get(self::SUBMITTEDBYUSERAPITOKEN);
 
                 if ($request->file()) {
                     if (is_array($request->file())) {
@@ -57,7 +41,7 @@ class UploadsController extends Controller
                             //                        Log::info("handleUploadResults YYY File path: " . $file->getPathname());
                             //                        Log::info("handleUploadResults YYY params: " . print_r($request->all(), true));
 
-                            $file->move("uploads/{$apiToken}/renders", $file->getClientOriginalName());
+                            $file->move("uploads/{$submittedByUserApiToken}/renders", $file->getClientOriginalName());
                         }
                     } else {
                         throw new \Exception("Received file is not an array");
@@ -69,6 +53,9 @@ class UploadsController extends Controller
                 throw new \Exception("Could not find requesting user");
             }
         } catch(\Exception $exception) {
+
+            Log::info('error: ' . $exception->getMessage());
+
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
         }
     }
@@ -106,6 +93,8 @@ class UploadsController extends Controller
                 throw new \Exception("Could not find requesting user");
             }
         } catch(\Exception $exception) {
+            Log::info('error: ' . $exception->getMessage());
+            
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
         }
     }
