@@ -94,7 +94,7 @@ class UploadsController extends Controller
             }
         } catch(\Exception $exception) {
             Log::info('error: ' . $exception->getMessage());
-            
+
             throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
         }
     }
