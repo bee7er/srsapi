@@ -85,6 +85,8 @@ class RendersController extends Controller
                 $render->status = Render::READY;
                 $render->save();
 
+                $renderId = $render->id;
+
                 // User's data has changed for this render
                 Render::dataHasChanged($render->id);
 

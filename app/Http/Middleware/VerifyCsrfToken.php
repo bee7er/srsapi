@@ -36,7 +36,7 @@ class VerifyCsrfToken extends BaseVerifier
      */
     public function handle($request, Closure $next)
     {
-        Log::info("*** In VerifyCsrfToken with request: " . $request->getUri());
+        // Log::info("*** In VerifyCsrfToken with request: " . $request->getUri());
 
         return parent::handle($request, $next);
     }

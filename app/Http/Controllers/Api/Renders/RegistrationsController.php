@@ -125,8 +125,6 @@ class RegistrationsController extends Controller
             if ($user) {
                 $user->checkApiToken($request->get(self::APITOKEN));
 
-                Log::info('Got user for email: ' . $request->get(self::EMAIL));
-
                 $result = DB::table('render_details as rd')
                     ->select(
                         'rd.id', 'rd.status','rd.from','rd.to',
@@ -174,6 +172,8 @@ class RegistrationsController extends Controller
                     $submittedByUserApiToken = $result->submittedByUserApiToken;
 
                     $actionInstruction = self::AI_DO_RENDER;
+
+                    Log::info('Instructing user for email: ' . $request->get(self::EMAIL) . ' do render detail id ' . $renderDetailId);
                 }
 
                 $result = 'OK';
@@ -231,7 +231,7 @@ class RegistrationsController extends Controller
                 $user->checkApiToken($request->get(self::APITOKEN));
 
                 // Heart beat from the slaves, it signals that the slave is active
-                Log::info('Got user for email: ' . $request->get(self::EMAIL));
+                //Log::info('Got user for email: ' . $request->get(self::EMAIL));
 
                 // Here we check to see if any earlier requests from this user have been rendered;
                 // the slave user can then pull down the results
@@ -365,7 +365,7 @@ class RegistrationsController extends Controller
                     $message = "No renders are currently outstanding";
                     Log::info($message);
                 } else {
-//                    Log::info('Render details available for downloads: ' . print_r($renderResults, true));
+                    Log::info('Render details available for downloads: ' . print_r($renderResults, true));
                     if ($renderResults) {
                         $sep = "";
                         foreach ($renderResults as $render) {
