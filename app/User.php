@@ -11,6 +11,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
@@ -92,5 +93,25 @@ class User extends Model implements AuthenticatableContract,
      */
     public function isAdmin() {
         return (self::ADMIN === $this->role);
+    }
+
+    /**
+     * Returns arrays of users who are currently available
+     *
+     * @return array
+     */
+    public static function getAvailableUsers()
+    {
+        $builder = DB::table('users as u')
+            ->select(
+                'u.id','u.surname','u.first_name','u.email','u.status'
+            )
+            ->where('u.status', '=', 'available');
+
+        $users = $builder
+            ->orderBy('u.surname', 'ASC')
+            ->get();
+
+        return $users;
     }
 }

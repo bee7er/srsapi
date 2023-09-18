@@ -98,7 +98,32 @@ class RenderDetail extends Model
     public static function getSubmissionsAndRendersAsHTML($submittedByUserId)
     {
         list($submissions, $renders) = self::getSubmissionsAndRenders($submittedByUserId);
+        $availableUsers = User::getAvailableUsers();
         $html = '<table style="font-size:11px;width:100%;">';
+        $html .= '<tr><td colspan="4" style="font-size:16px;font-weight:bold;">Team Members Currently Available</td></tr>';
+        $html .= "<tr><th>Surname</th><th>First Name</th><th>Email</th><th>Status</th></tr>";
+        $entryCount = 0;
+
+        $color = $grey = '#d8d8d8';
+        $blue = '#a6ffff';
+        if (is_array($availableUsers) && 0 < count($availableUsers)) {
+            foreach ($availableUsers as $availableUser) {
+                $entryCount++;
+                // Highlight the user when they are available
+                if ($availableUser->id == $submittedByUserId) {
+                    $color = '#a851d6';
+                    $availableUser->surname = 'You';
+                    $availableUser->first_name = '';
+                }
+                // Build a row with this information
+                $html .= "<tr style=\"background-color: {$color};\"><td>{$availableUser->surname}</td><td>{$availableUser->first_name}</td><td>{$availableUser->email}</td><td>{$availableUser->status}</td></tr>";
+                $color = ($color == $grey ? $blue: $grey);
+            }
+        } else {
+            $html .= "<tr style=\"background-color: {$color};\"><td colspan=\"4\">None</td></tr>";
+        }
+        $html .= "<tr style=\"background-color: {$color};text-align: right;\"><th colspan=\"4\" style=\"padding-right: 15px;\">Entry count: {$entryCount}</th></tr>";
+
         $html .= '<tr><td colspan="4" style="font-size:16px;font-weight:bold;">Submitted by You</td></tr>';
         $html .= "<tr><th>Project</th><th>Chunk</th><th>Allocated to</th><th>Status</th></tr>";
         $entryCount = 0;
