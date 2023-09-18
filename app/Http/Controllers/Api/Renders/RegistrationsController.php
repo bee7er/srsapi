@@ -51,7 +51,7 @@ class RegistrationsController extends Controller
         $message = "Registration received OK";
         $result = 'OK';
         try {
-            Log::info('In register user for email: ' . $request->get(self::EMAIL));
+            //Log::info('In register user for email: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
@@ -119,7 +119,7 @@ class RegistrationsController extends Controller
             $submittedByUserId = '';
             $submittedByUserApiToken = '';
 
-            Log::info('In available user for email: ' . $request->get(self::EMAIL));
+            //Log::info('In available user for email: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
@@ -141,7 +141,7 @@ class RegistrationsController extends Controller
 
                 if (null == $result) {
                     $message = "No renders are currently pending";
-                    Log::info($message);
+                    //Log::info($message);
                     $result = 'OK';
                 } else {
                     // Set the render to rendering
@@ -173,7 +173,7 @@ class RegistrationsController extends Controller
 
                     $actionInstruction = self::AI_DO_RENDER;
 
-                    Log::info('Instructing user for email: ' . $request->get(self::EMAIL) . ' do render detail id ' . $renderDetailId);
+                    //Log::info('Instructing user for email: ' . $request->get(self::EMAIL) . ' do render detail id ' . $renderDetailId);
                 }
 
                 $result = 'OK';
@@ -224,7 +224,7 @@ class RegistrationsController extends Controller
             $frameDetails = [];
             $allocatedToUsers = [];
 
-            Log::info('In awake user for email: ' . $request->get(self::EMAIL));
+            //Log::info('In awake user for email: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
@@ -239,13 +239,13 @@ class RegistrationsController extends Controller
 
                 if (null == $results) {
                     $message = "No renders are currently available for download";
-                    Log::info($message);
+                    //Log::info($message);
                 } else {
                     $count = 1;
                     if (is_array($results)) {
                         $count = count($results);
                     }
-                    Log::info('Render details available for downloads: ' . $count);
+                    //Log::info('Render details available for downloads: ' . $count);
                     if ($results && 0 < count($results)) {
                         $renderIdAry = [];
 
@@ -343,7 +343,7 @@ class RegistrationsController extends Controller
         try {
             $message = "Status request received OK\n";
             $result = 'Error';
-            Log::info('In status request for email: ' . $request->get(self::EMAIL));
+            //Log::info('In status request for email: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL)) -> first();
             if ($user) {
@@ -363,9 +363,9 @@ class RegistrationsController extends Controller
 
                 if (null == $renderResults) {
                     $message = "No renders are currently outstanding";
-                    Log::info($message);
+                    //Log::info($message);
                 } else {
-                    Log::info('Render details available for downloads: ' . print_r($renderResults, true));
+                    //Log::info('Render details available for downloads: ' . print_r($renderResults, true));
                     if ($renderResults) {
                         $sep = "";
                         foreach ($renderResults as $render) {
@@ -422,7 +422,7 @@ class RegistrationsController extends Controller
             $message = "Rendering notification received OK";
             $result = 'Error';
 
-            Log::info('In rendering for email: ' . $request->get(self::EMAIL));
+            //Log::info('In rendering for email: ' . $request->get(self::EMAIL));
             // Do something
 
             $result = 'OK';
@@ -453,8 +453,7 @@ class RegistrationsController extends Controller
             $message = "Complete notification received OK";
             $result = 'Error';
 
-            Log::info('In complete for email: ' . $request->get(self::EMAIL));
-            Log::info('In complete for render details id: ' . $request->get(self::RENDERDETAILID));
+            Log::info('In complete for email: ' . $request->get(self::EMAIL) . ' and render details id: ' . $request->get(self::RENDERDETAILID));
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
                 $user->checkApiToken($request->get(self::APITOKEN));
@@ -481,7 +480,7 @@ class RegistrationsController extends Controller
                     $render->status = Render::COMPLETE;
                     $render->completed_at = date('Y-m-d H:i:s');
                     $render->save();
-                    Log::info('Render is COMPLETE with id: ' . $renderDetail->render_id);
+                    //Log::info('Render is COMPLETE with id: ' . $renderDetail->render_id);
                 }
 
                 // User's data has changed for this render

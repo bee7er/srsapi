@@ -25,7 +25,7 @@ class UploadsController extends Controller
     public function handleUploadResults(Request $request)
     {
         try {
-            Log::info('In handle upload results: ' . $request->get(self::EMAIL));
+            //Log::info('In handle upload results: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
@@ -69,7 +69,7 @@ class UploadsController extends Controller
     public function handleUploadProjects(Request $request)
     {
         try {
-            Log::info('In handle upload projects: ' . $request->get(self::EMAIL));
+            //Log::info('In handle upload projects: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {

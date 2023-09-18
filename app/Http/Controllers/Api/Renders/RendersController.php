@@ -58,7 +58,7 @@ class RendersController extends Controller
             $renderId = 0;
 
             // Write header and detail records to db
-            Log::info('In render for email: ' . $request->get(self::EMAIL));
+            //Log::info('In render for email: ' . $request->get(self::EMAIL));
 
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
@@ -141,7 +141,7 @@ class RendersController extends Controller
     private function handleRenderDetails($renderId, $from, $to)
     {
         // Chunk it up
-        Log::info("Chunking render details $from - $to");
+        //Log::info("Chunking render details $from - $to");
         while (($to - $from) >= 0) {
             $topOfRange = $from + self::CHUNK - 1;
             if ($topOfRange > $to) {
