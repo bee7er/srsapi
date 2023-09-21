@@ -6,9 +6,10 @@
         <h1>Welcome to the Shared Render Service</h1>
         <p>The <span class="" style="font-weight: bold;">Shared Render Service</span> is designed to help animators manage the rendering of their animations created in <span class="" style="font-weight: bold;">Cinema 4D</span>.</p>
         <p>A team can consist of one or more animators.</p>
-        <p>If a team member has some spare capacity or a powerful machine they make themselves available to render their or other team members renders.</p>
-        <p>Render requests are submitted across the world wide web to a server which is managing all renders for the team.</p>
+        <p>If a team member has some spare capacity or a powerful machine they make themselves available to render their or the other team members' renders.</p>
+        <p>Render requests are submitted across the web to a server which is managing all renders for the team.</p>
         <p>A given render request is divided into manageable chunks and distributed around the available team members.</p>
+
         <h2>Registration Plugin</h2>
         <p>A plugin running in the background of each C4D instance communicates with the remote server.  It performs the following operations:</p>
         <ul>
@@ -23,16 +24,12 @@
         <ul>
             <li><span class="" style="font-weight: bold;">Project</span>: the name of the project with assets from which frames are to be rendered.</li>
             <li><span class="" style="font-weight: bold;">Whether to use project settings</span>:
-                <ul>
-                    <li>For the frame range to render</li>
-                    <li>For the output format</li>
-                </ul>
+                    <div>For the frame range to render</div>
+                    <div>For the output format</div>
             </li>
             <li><span class="" style="font-weight: bold;">Whether to use custom settings</span>:
-                <ul>
-                    <li>For one or more individual frames to render</li>
-                    <li>For one or more frame ranges to render</li>
-                </ul>
+                    <div>For one or more individual frames to render</div>
+                    <div>For one or more frame ranges to render</div>
             </li>
         </ul>
     </div>
