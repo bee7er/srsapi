@@ -78,11 +78,11 @@
                                                 <td>{!! $render->first_name !!} {!! $render->surname !!}</td>
                                                 <td>{!! date('d/m/Y H:i', strtotime($render->created_at)) !!}</td>
                                                 <td>{!! ($render->completed_at ? date('d/m/Y H:i', strtotime($render->completed_at)): '') !!}</td>
-                                                <td title="Render detail id: {!! $render->render_detail_id !!}">
+                                                <td style="text-align: center;" title="Render detail id: {!! $render->render_detail_id !!}">
                                                     @if ($render->detail_status == RenderDetail::ALLOCATED)
                                                     {!! link_to_action('RendersController@reassign', 'Reassign', $parameters = ['render_detail_id' => $render->render_detail_id], $attributes = []) !!}
                                                     @else
-                                                        <span title="Render detail id: {!! $render->render_detail_id !!}">None</span>
+                                                        <span title="Render detail id: {!! $render->render_detail_id !!}">-</span>
                                                     @endif
                                                 </td>
                                             </tr>
@@ -126,11 +126,11 @@
                                                 <td>{!! $render->first_name !!} {!! $render->surname !!}</td>
                                                 <td>{!! date('d/m/Y H:i', strtotime($render->created_at)) !!}</td>
                                                 <td>{!! ($render->completed_at ? date('d/m/Y H:i', strtotime($render->completed_at)): '') !!}</td>
-                                                <td title="Render detail id: {!! $render->render_detail_id !!}">
+                                                <td style="text-align: center;" title="Render detail id: {!! $render->render_detail_id !!}">
                                                     @if ($render->detail_status == RenderDetail::ALLOCATED)
                                                         {!! link_to_action('RendersController@reassign', 'Reassign', $parameters = ['render_detail_id' => $render->render_detail_id], $attributes = []) !!}
                                                     @else
-                                                        <span title="Render detail id: {!! $render->render_detail_id !!}">None</span>
+                                                        <span title="Render detail id: {!! $render->render_detail_id !!}">-</span>
                                                     @endif
                                                 </td>
                                             </tr>
