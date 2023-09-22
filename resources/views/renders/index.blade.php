@@ -54,8 +54,9 @@
                                     <tr>
                                         <th>Render Id</th>
                                         <th>Project</th>
-                                        <th>Render Status</th>
-                                        <th>Chunk Status</th>
+                                        <th>Render Sts</th>
+                                        <th>Chunk</th>
+                                        <th>Chunk Sts</th>
                                         <th>Allocated to</th>
                                         <th>Submitted at</th>
                                         <th>Completed at</th>
@@ -72,6 +73,7 @@
                                                 <td class="srs-id">{!! $render->render_id !!}</td>
                                                 <td class="">{!! $render->c4dProjectWithAssets !!}</td>
                                                 <td class="{!! $render->render_status !!}">{!! $render->render_status !!}</td>
+                                                <td class="">{!! $render->from !!}-{!! $render->to !!}</td>
                                                 <td class="{!! $render->detail_status !!}">{!! $render->detail_status !!}</td>
                                                 <td>{!! $render->first_name !!} {!! $render->surname !!}</td>
                                                 <td>{!! date('d/m/Y H:i', strtotime($render->created_at)) !!}</td>
@@ -88,7 +90,7 @@
                                         @endforeach
                                     @else
                                         <tr style="background-color: {!! $color !!};">
-                                            <td colspan="8"><p>No renders found</p></td>
+                                            <td colspan="9"><p>No renders found</p></td>
                                         </tr>
                                     @endif
                                 </table>
@@ -100,8 +102,9 @@
                                     <tr>
                                         <th>Render Id</th>
                                         <th>Project</th>
-                                        <th>Render Status</th>
-                                        <th>Chunk Status</th>
+                                        <th>Render Sts</th>
+                                        <th>Chunk</th>
+                                        <th>Chunk Sts</th>
                                         <th>Submitted by</th>
                                         <th>Submitted at</th>
                                         <th>Completed at</th>
@@ -118,6 +121,7 @@
                                                 <td class="srs-id">{!! $render->render_id !!}</td>
                                                 <td class="">{!! $render->c4dProjectWithAssets !!}</td>
                                                 <td class="{!! $render->render_status !!}">{!! $render->render_status !!}</td>
+                                                <td class="">{!! $render->from !!}-{!! $render->to !!}</td>
                                                 <td class="{!! $render->detail_status !!}">{!! $render->detail_status !!}</td>
                                                 <td>{!! $render->first_name !!} {!! $render->surname !!}</td>
                                                 <td>{!! date('d/m/Y H:i', strtotime($render->created_at)) !!}</td>
@@ -134,7 +138,7 @@
                                         @endforeach
                                     @else
                                         <tr style="background-color: {!! $color !!};">
-                                            <td colspan="8"><p>No renders found</p></td>
+                                            <td colspan="9"><p>No renders found</p></td>
                                         </tr>
                                     @endif
                                 </table>
