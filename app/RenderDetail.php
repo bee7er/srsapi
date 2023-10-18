@@ -176,9 +176,11 @@ class RenderDetail extends Model
         return DB::table('render_details as rd')
             ->select(
                 'rd.id','rd.status','rd.allocated_to_user_id','rd.from','rd.to',
-                'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat'
+                'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat',
+                'u.id as submittedByUserId','u.api_token as submittedByUserApiToken'
             )
             ->join('renders as r', 'r.id', '=', 'rd.render_id')
+            ->join('users as u', 'u.id', '=', 'r.submitted_by_user_id')
             ->where('r.submitted_by_user_id', '=', $submittedByUserId)
             ->where('r.status', '=', Render::COMPLETE)
             ->orderBy('render_id', 'ASC')

@@ -261,11 +261,15 @@ class RegistrationsController extends Controller
                             $c4dProjectWithAssets = $result->c4dProjectWithAssets;
                             // NB We only want one record for each render, hence using the id as the index
                             $renderIdAry[$renderDetail->render_id] = $renderDetail->render_id;
+                            // Get all the images from the renders directory, so we can find out the actual name generated
+                            $images = array_diff(scandir("uploads/{$result->submittedByUserApiToken}/renders"), array('.', '..','.DS_Store'));
                             // Add an entry for each render that has occured in the range from and to
                             for ($i=$renderDetail->from; $i<=$renderDetail->to; $i++) {
-                                $filename = explode(".", $c4dProjectWithAssets);
-                                $frameDetails[] = $filename[0] . sprintf("%04d", $i) . "." . $result->outputFormat;
-
+                                // NB we have to find the actual name in the directory using the frame number, which is reliable.
+                                $fileName = $this->getArrayValue($images, sprintf("%04d", $i) . "." . $result->outputFormat);
+                                if (null !== $fileName) {
+                                    $frameDetails[] = $fileName;
+                                }
                             }
 
                             // User's data has changed for this render, and the original user, too
@@ -330,6 +334,21 @@ class RegistrationsController extends Controller
         ];
 
         return $returnData;   // Gets converted to json
+    }
+
+    /**
+     * Search array for string and return the array value
+     *
+     */
+    private function getArrayValue(array $stringAry, $searchStr)
+    {
+        foreach ($stringAry as $elem) {
+            if (false !== strpos($elem, $searchStr)) {
+                return $elem;
+            }
+        }
+
+        return null;
     }
 
     /**
