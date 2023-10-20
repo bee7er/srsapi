@@ -19,6 +19,7 @@ class VerifyCsrfToken extends BaseVerifier
         'api1/available',
         'api1/rendering',
         'api1/complete',
+        'api1/downloaded',
         'api1/render',
         'api1/status',
         'projects',

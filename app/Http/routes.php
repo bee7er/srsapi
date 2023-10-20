@@ -86,6 +86,13 @@ Route::post('/api1/complete', function (Request $request) {
     );
 });
 
+// Slave user notifying master that the downloading of an image is now complete
+Route::post('/api1/downloaded', function (Request $request) {
+    return response()->json(
+        (new RegistrationsController)->downloaded($request)
+    );
+});
+
 // Slave user requesting a render to be processed
 Route::post('/api1/render', function (Request $request) {
     return response()->json(

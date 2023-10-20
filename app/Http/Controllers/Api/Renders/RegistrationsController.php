@@ -25,6 +25,7 @@ class RegistrationsController extends Controller
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const CUSTOMFRAMERANGE = "customFrameRange";
     const EMAIL = "email";
+    const FILENAME = "fileName";
     const FRAMEDETAILS = "frameDetails";
     const FROM = "from";
     const OUTPUTFORMAT = "outputFormat";
@@ -241,11 +242,6 @@ class RegistrationsController extends Controller
                     $message = "No renders are currently available for download";
                     //Log::info($message);
                 } else {
-                    $count = 1;
-                    if (is_array($results)) {
-                        $count = count($results);
-                    }
-                    //Log::info('Render details available for downloads: ' . $count);
                     if ($results && 0 < count($results)) {
                         $renderIdAry = [];
 
@@ -262,7 +258,7 @@ class RegistrationsController extends Controller
                             // NB We only want one record for each render, hence using the id as the index
                             $renderIdAry[$renderDetail->render_id] = $renderDetail->render_id;
                             // Get all the images from the renders directory, so we can find out the actual name generated
-                            $images = array_diff(scandir("uploads/{$result->submittedByUserApiToken}/renders"), array('.', '..','.DS_Store'));
+                            $images = array_diff(scandir("uploads/{$result->submittedByUserApiToken}/renders", SCANDIR_SORT_DESCENDING), array('.', '..','.DS_Store'));
                             // Add an entry for each render that has occured in the range from and to
                             for ($i=$renderDetail->from; $i<=$renderDetail->to; $i++) {
                                 // NB we have to find the actual name in the directory using the frame number, which is reliable.
@@ -277,6 +273,7 @@ class RegistrationsController extends Controller
                         }
 
                         if ($renderIdAry && 0 < count($renderIdAry)) {
+                            // NB There could be more than one render completed
                             foreach ($renderIdAry as $renderId) {
                                 // Render now set to returned and it is fully processed
                                 $render = Render::find($renderId);
@@ -288,7 +285,6 @@ class RegistrationsController extends Controller
                             }
                         }
                     }
-
 
                     $actionInstruction = self::AI_DO_DOWNLOAD;
                 }
@@ -492,6 +488,7 @@ class RegistrationsController extends Controller
                     ->where('rd.status', '!=', RenderDetail::DONE)
                     ->get();
                 if (0 >= count($result)) {
+                    // All render detail chunks are DONE, set the render to COMPLETE and do some housekeeping
                     $render = Render::find($renderDetail->render_id);
                     if (!$render) {
                         throw new \Exception("Could not find render record with id '{$renderDetail->render_id}'");
@@ -520,6 +517,103 @@ class RegistrationsController extends Controller
         ];
 
         return $returnData;   // Gets converted to json
+    }
+
+    /**
+     * Image downloaded notification from a slave user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function downloaded(Request $request)
+    {
+        $result = null;
+        try {
+            $message = "Downloaded notification received OK";
+
+            $user = User::where('email', $request->get(self::EMAIL))->first();
+            if ($user) {
+                $user->checkApiToken($request->get(self::APITOKEN));
+
+                $fileNameFullPath = "uploads/{$user->api_token}/renders/{$request->get(self::FILENAME)}";
+                if (unlink($fileNameFullPath)) {
+                    //Log::info("*** File: {$fileNameFullPath} successfully deleted");
+                } else {
+                    throw new \Exception("Could not delete file '{$fileNameFullPath}'");
+                }
+            }
+
+            $result = 'OK';
+
+        } catch(\Exception $exception) {
+            $result = 'Error';
+            $message = $exception->getMessage();
+            Log::info('Error: ' . $message);
+        }
+
+        $returnData = [
+            "message" => $message,
+            "result" => $result
+        ];
+
+        return $returnData;   // Gets converted to json
+    }
+
+    /**
+     * Get the details of a render request and do the completion housekeeping
+     */
+    public function completionHousekeeping($renderId)
+    {
+        try {
+            //Log::info("*** Housekeeping for render id: {$renderId}");
+            $results = DB::table('renders as r')
+                ->select(
+                    'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat',
+                    'rd.id as render_detail_id','rd.status as detail_status','rd.allocated_to_user_id','rd.from','rd.to',
+                    'u.id as submittedByUserId','u.api_token as submittedByUserApiToken'
+                )
+                ->join('render_details as rd', 'rd.render_id', '=', 'r.id')
+                ->join('users as u', 'u.id', '=', 'r.submitted_by_user_id')
+                ->where('r.id', '=', $renderId)
+                ->where('r.status', '=', Render::RETURNED)
+                ->orderBy('render_id', 'ASC')
+                ->orderBy('rd.id', 'ASC')
+                ->get();
+
+            if (count($results) > 0) {
+
+                foreach ($results as $result) {
+                    // Render detail now set to returned
+                    $renderDetail = RenderDetail::find($result->render_detail_id);
+                    if (!$renderDetail) {
+                        throw new \Exception("Could not find render detail record with id '{$result->render_detail_id}'");
+                    }
+
+                    //Log::info('*** Housekeeping render detail: ' . $result->render_detail_id);
+
+                    // Get all the images from the renders directory, so we can delete those for this render
+                    $images = array_diff(scandir("uploads/{$result->submittedByUserApiToken}/renders", SCANDIR_SORT_DESCENDING), array('.', '..','.DS_Store'));
+                    // Add an entry for each render that has occured in the range from and to
+                    for ($i=$renderDetail->from; $i<=$renderDetail->to; $i++) {
+                        // NB we have to find the actual name in the directory using the frame number, which is reliable.
+                        $fileName = $this->getArrayValue($images, sprintf("%04d", $i) . "." . $result->outputFormat);
+                        if (null !== $fileName) {
+                            if (unlink("uploads/{$result->submittedByUserApiToken}/renders/{$fileName}")) {
+                                Log::info("*** File: {$fileName} successfully deleted");
+                            } else {
+                                throw new \Exception("Could not delete file '{$fileName}'");
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        } catch(\Exception $exception) {
+            $result = 'Error';
+            $message = $exception->getMessage();
+            Log::info('Error: ' . $message);
+        }
     }
 
 }
