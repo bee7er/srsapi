@@ -14,6 +14,7 @@ class UploadsController extends Controller
 {
     const EMAIL = "email";
     const APITOKEN = "apiToken";
+    const RENDERID = "renderId";
     const SUBMITTEDBYUSERAPITOKEN = "submittedByUserApiToken";
 
     /**
@@ -36,12 +37,16 @@ class UploadsController extends Controller
 
                 if ($request->file()) {
                     if (is_array($request->file())) {
+                        $saveToDir = "uploads/{$submittedByUserApiToken}/renders/{$request->get(self::RENDERID)}";
+                        if (!is_dir($saveToDir) && !mkdir($saveToDir)){
+                            throw new \Exception("Error creating folder {$saveToDir}");
+                        }
                         foreach ($request->file() as $file) {
                             //                        Log::info("handleUploadResults YYY File name: " . $file->getClientOriginalName());
                             //                        Log::info("handleUploadResults YYY File path: " . $file->getPathname());
                             //                        Log::info("handleUploadResults YYY params: " . print_r($request->all(), true));
 
-                            $file->move("uploads/{$submittedByUserApiToken}/renders", $file->getClientOriginalName());
+                            $file->move($saveToDir, $file->getClientOriginalName());
                         }
                     } else {
                         throw new \Exception("Received file is not an array");
@@ -77,11 +82,15 @@ class UploadsController extends Controller
 
                 if ($request->file()) {
                     if (is_array($request->file())) {
+                        $saveToDir = "uploads/{$user->api_token}/projects/{$request->get(self::RENDERID)}";
+                        if (!is_dir($saveToDir) && !mkdir($saveToDir)){
+                            throw new \Exception("Error creating folder {$saveToDir}");
+                        }
                         foreach ($request->file() as $file) {
 //                            Log::info("File name: " . $file->getClientOriginalName());
 //                            Log::info("File path: " . $file->getPathname());
 //                            Log::info("Move to: uploads/{$user->api_token}/projects");
-                            $file->move("uploads/{$user->api_token}/projects", $file->getClientOriginalName());
+                            $file->move($saveToDir, $file->getClientOriginalName());
                         }
                     } else {
                         throw new \Exception("Received file is not an array");

@@ -31,6 +31,7 @@ class RegistrationsController extends Controller
     const OUTPUTFORMAT = "outputFormat";
     const OVERRIDESETTINGS = "overrideSettings";
     const RENDERDETAILID = "renderDetailId";
+    const RENDERID = "renderId";
     const SUBMISSIONSANDRENDERS = "submissionsAndRenders";
     const SUBMITTEDBYUSERID = "submittedByUserId";
     const SUBMITTEDBYUSERAPITOKEN = "submittedByUserApiToken";
@@ -119,6 +120,7 @@ class RegistrationsController extends Controller
             $outputFormat = '';
             $submittedByUserId = '';
             $submittedByUserApiToken = '';
+            $renderId = '';
 
             //Log::info('In available user for email: ' . $request->get(self::EMAIL));
 
@@ -152,6 +154,8 @@ class RegistrationsController extends Controller
                     }
                     $render->status = Render::RENDERING;
                     $render->save();
+
+                    $renderId = $result->render_id;
                     // Allocate the render to the available slave
                     $renderDetailId = $result->id;
                     $renderDetail = RenderDetail::find($renderDetailId);
@@ -201,6 +205,7 @@ class RegistrationsController extends Controller
             self::OUTPUTFORMAT => $outputFormat,
             self::SUBMITTEDBYUSERID => $submittedByUserId,
             self::SUBMITTEDBYUSERAPITOKEN => $submittedByUserApiToken,
+            self::RENDERID => $renderId,
             "result" => $result,
             "message" => $message,
         ];
@@ -243,7 +248,6 @@ class RegistrationsController extends Controller
                     //Log::info($message);
                 } else {
                     if ($results && 0 < count($results)) {
-                        $renderIdAry = [];
 
                         foreach ($results as $result) {
                             // Render detail now set to returned
@@ -255,26 +259,34 @@ class RegistrationsController extends Controller
                             $renderDetail->save();
 
                             $c4dProjectWithAssets = $result->c4dProjectWithAssets;
-                            // NB We only want one record for each render, hence using the id as the index
-                            $renderIdAry[$renderDetail->render_id] = $renderDetail->render_id;
+                            // NB We accumulate frame details for each render id we encounter
+                            $renderId = $renderDetail->render_id;
+                            $frameDetails[$renderId] = [];
                             // Get all the images from the renders directory, so we can find out the actual name generated
-                            $images = array_diff(scandir("uploads/{$result->submittedByUserApiToken}/renders", SCANDIR_SORT_DESCENDING), array('.', '..','.DS_Store'));
-                            // Add an entry for each render that has occured in the range from and to
+                            $images = array_diff(
+                                scandir(
+                                    "uploads/{$result->submittedByUserApiToken}/renders/{$renderId}",
+                                    SCANDIR_SORT_DESCENDING),
+                                    array('.', '..','.DS_Store')
+                            );
+                            // Add an entry for each render that has occurred in the range from and to
                             for ($i=$renderDetail->from; $i<=$renderDetail->to; $i++) {
                                 // NB we have to find the actual name in the directory using the frame number, which is reliable.
                                 $fileName = $this->getArrayValue($images, sprintf("%04d", $i) . "." . $result->outputFormat);
                                 if (null !== $fileName) {
-                                    $frameDetails[] = $fileName;
+                                    $frameDetails[$renderId][] = $fileName;
                                 }
                             }
 
                             // User's data has changed for this render, and the original user, too
-                            Render::dataHasChanged($renderDetail->render_id, $renderDetail->allocated_to_user_id);
+                            Render::dataHasChanged($renderId, $renderDetail->allocated_to_user_id);
                         }
 
-                        if ($renderIdAry && 0 < count($renderIdAry)) {
+                        Log::info('** LOOKOUT array keys: ' . print_r($frameDetails, true));
+
+                        if ($frameDetails && 0 < count($frameDetails)) {
                             // NB There could be more than one render completed
-                            foreach ($renderIdAry as $renderId) {
+                            foreach(array_keys($frameDetails) as $renderId) {
                                 // Render now set to returned and it is fully processed
                                 $render = Render::find($renderId);
                                 if (!$render) {
@@ -535,7 +547,7 @@ class RegistrationsController extends Controller
             if ($user) {
                 $user->checkApiToken($request->get(self::APITOKEN));
 
-                $fileNameFullPath = "uploads/{$user->api_token}/renders/{$request->get(self::FILENAME)}";
+                $fileNameFullPath = "uploads/{$user->api_token}/renders/{$request->get(self::RENDERID)}/{$request->get(self::FILENAME)}";
                 if (unlink($fileNameFullPath)) {
                     //Log::info("*** File: {$fileNameFullPath} successfully deleted");
                 } else {
@@ -598,7 +610,7 @@ class RegistrationsController extends Controller
                         // NB we have to find the actual name in the directory using the frame number, which is reliable.
                         $fileName = $this->getArrayValue($images, sprintf("%04d", $i) . "." . $result->outputFormat);
                         if (null !== $fileName) {
-                            if (unlink("uploads/{$result->submittedByUserApiToken}/renders/{$fileName}")) {
+                            if (unlink("uploads/{$result->submittedByUserApiToken}/renders/{$result->render_id}/{$fileName}")) {
                                 Log::info("*** File: {$fileName} successfully deleted");
                             } else {
                                 throw new \Exception("Could not delete file '{$fileName}'");

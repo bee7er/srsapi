@@ -96,6 +96,7 @@ class RendersController extends Controller
                 // User can only be added by the administrator
                 $message = "Could not find user with email: " . $request->get(self::EMAIL);
                 Log::info('Error: ' . $message);
+                $renderId = 0;
                 $result = 'Error';
             }
 
