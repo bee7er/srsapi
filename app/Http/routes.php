@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 Route::get('/', 'HomeController@index');
 
 Route::get('home', 'HomeController@index');
+Route::get('/home', 'HomeController@index');
 
 Route::get('renders', 'RendersController@index');
 Route::get('reassign', 'RendersController@reassign');

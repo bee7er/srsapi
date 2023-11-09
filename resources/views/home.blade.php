@@ -18,6 +18,7 @@
             <li><span class="" style="font-weight: bold;">Rendering</span>: notifies the server that you are currently rendering a chunk of frames</li>
             <li><span class="" style="font-weight: bold;">Complete</span>: notifies the server that the chunk of frames has been rendered and can be returned to the team member who submitted the render request</li>
         </ul>
+
         <h2>Render Submission Plugin</h2>
         <p>A plugin that enables the team member to submit one or more frames, or frame ranges to be rendered.</p>
         <p>The details provided are:</p>
@@ -32,6 +33,11 @@
                     <div>For one or more frame ranges to render</div>
             </li>
         </ul>
+
+        <h2>Shared Render Service API</h2>
+        <p>The SRS API receives render requests from the various team members originating from the Render Submission plugin.</p>
+        <p>The API is responsible for chunking the set of frames to be rendered and allocating each chunk to an available team member.</p>
+        <p>All communication from both the Registration and Render Submission plugins is via the API.  The API assesses the status of the team member clients and their renders and instructs them on what action to take.  Since the API only passes instructions across to clients the movement of files between the clients and the server API is initiated by the clients with pull requests.</p>
     </div>
 
 @stop

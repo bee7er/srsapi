@@ -55,7 +55,7 @@ class UploadsController extends Controller
                     throw new \Exception("Could not receive file");
                 }
             } else {
-                throw new \Exception("Could not find requesting user");
+                throw new \Exception("Upload results could not find requesting user for email '{$request->get(self::EMAIL)}'");
             }
         } catch(\Exception $exception) {
 
@@ -74,7 +74,7 @@ class UploadsController extends Controller
     public function handleUploadProjects(Request $request)
     {
         try {
-            //Log::info('In handle upload projects: ' . $request->get(self::EMAIL));
+            //Log::info('In handle upload projects: ' . print_r($request->all(), true));
 
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
@@ -99,7 +99,7 @@ class UploadsController extends Controller
                     throw new \Exception("Could not receive file");
                 }
             } else {
-                throw new \Exception("Could not find requesting user");
+                throw new \Exception("Upload project could not find requesting user for email '" . self::EMAIL . "', {$request->get(self::EMAIL)}'");
             }
         } catch(\Exception $exception) {
             Log::info('error: ' . $exception->getMessage());
