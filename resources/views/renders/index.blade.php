@@ -81,6 +81,8 @@
                                                 <td style="text-align: center;" title="Render detail id: {!! $render->render_detail_id !!}">
                                                     @if ($render->detail_status == RenderDetail::ALLOCATED)
                                                     {!! link_to_action('RendersController@reassign', 'Reassign', $parameters = ['render_detail_id' => $render->render_detail_id], $attributes = []) !!}
+                                                    @elseif ($render->detail_status == RenderDetail::READY)
+                                                        {!! link_to_action('RendersController@cancel', 'Cancel', $parameters = ['render_detail_id' => $render->render_detail_id], $attributes = []) !!}
                                                     @else
                                                         <span title="Render detail id: {!! $render->render_detail_id !!}">-</span>
                                                     @endif
@@ -129,6 +131,8 @@
                                                 <td style="text-align: center;" title="Render detail id: {!! $render->render_detail_id !!}">
                                                     @if ($render->detail_status == RenderDetail::ALLOCATED)
                                                         {!! link_to_action('RendersController@reassign', 'Reassign', $parameters = ['render_detail_id' => $render->render_detail_id], $attributes = []) !!}
+                                                    @elseif ($render->detail_status == RenderDetail::READY)
+                                                        {!! link_to_action('RendersController@cancel', 'Cancel', $parameters = ['render_detail_id' => $render->render_detail_id], $attributes = []) !!}
                                                     @else
                                                         <span title="Render detail id: {!! $render->render_detail_id !!}">-</span>
                                                     @endif

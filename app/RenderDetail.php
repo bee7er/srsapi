@@ -13,6 +13,7 @@ class RenderDetail extends Model
     const ALLOCATED = 'allocated';
     const DONE = 'done';
     const RETURNED = 'returned';
+    const CANCELLED = 'cancelled';
 
     /**
      * The attributes that are mass assignable.
@@ -47,6 +48,8 @@ class RenderDetail extends Model
         if (0 != $selectedUserId) {
             $builder->where('r.submitted_by_user_id', '=', $selectedUserId);
         }
+
+        //$builder->where('r.status', '!=', Render::CANCELLED);
         // If include returned is not yes exclude them
         if (!isset($includeReturned)) {
             $builder->where('r.status', '!=', Render::RETURNED);
@@ -73,6 +76,8 @@ class RenderDetail extends Model
         if (0 != $selectedUserId) {
             $builder->where('rd.allocated_to_user_id', '=', $selectedUserId);
         }
+
+        //$builder->where('r.status', '!=', Render::CANCELLED);
         // If include returned is not yes exclude them
         if (!isset($includeReturned)) {
             $builder->where('r.status', '!=', Render::RETURNED);

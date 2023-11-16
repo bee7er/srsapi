@@ -12,6 +12,7 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('renders', 'RendersController@index');
 Route::get('reassign', 'RendersController@reassign');
+Route::get('cancel', 'RendersController@cancel');
 
 Route::get('cookies', 'PagesController@cookies');
 

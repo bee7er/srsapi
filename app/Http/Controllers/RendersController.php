@@ -102,4 +102,54 @@ class RendersController extends Controller
 
         return redirect('renders');
     }
+
+    /**
+     * Cancel a render detail record
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function cancel()
+    {
+        try {
+            $renderDetailsId = Input::get('render_detail_id');
+
+            $renderDetail = RenderDetail::find($renderDetailsId);
+            if (!$renderDetail) {
+                throw new Exception("Could not find render detail with id $renderDetailsId");
+            }
+            $renderDetail->status = RenderDetail::CANCELLED;
+            $renderDetail->save();
+
+            $result = DB::table('render_details as rd')
+                ->select(
+                    'rd.id', 'rd.status',
+                    'r.id as render_id','r.status as render_status'
+                )
+                ->join('renders as r', 'r.id', '=', 'rd.render_id')
+                ->where('r.id', $renderDetail->render_id)
+                ->where('rd.status', '!=', Render::CANCELLED)
+                ->first();
+            if (null == $result) {
+                // There are no render details which have not been cancelled, cancel the render
+                $render = Render::find($renderDetail->render_id);
+                if (!$render) {
+                    throw new Exception("Could not find render with id $renderDetail->render_id");
+                }
+                $render->status = Render::CANCELLED;
+                $render->save();
+            }
+
+            // User's data has changed for this render, and the original user, too
+            Render::dataHasChanged($renderDetail->render_id);
+
+            Session::flash('flash_message', 'Successfully cancelled render detail');
+            Session::flash('flash_type', 'alert-success');
+
+        } catch(Exception $e) {
+            Session::flash('flash_message', 'Error updating render detail: ' . $e->getMessage());
+            Session::flash('flash_type', 'alert-danger');
+        }
+
+        return redirect('renders');
+    }
 }
