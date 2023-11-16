@@ -261,7 +261,10 @@ class RegistrationsController extends Controller
                             $c4dProjectWithAssets = $result->c4dProjectWithAssets;
                             // NB We accumulate frame details for each render id we encounter
                             $renderId = $renderDetail->render_id;
-                            $frameDetails[$renderId] = [];
+                            if (!isset($frameDetails[$renderId])) {
+                                $frameDetails[$renderId] = [];
+                            }
+
                             // Get all the images from the renders directory, so we can find out the actual name generated
                             $images = array_diff(
                                 scandir(
@@ -281,8 +284,6 @@ class RegistrationsController extends Controller
                             // User's data has changed for this render, and the original user, too
                             Render::dataHasChanged($renderId, $renderDetail->allocated_to_user_id);
                         }
-
-                        Log::info('** LOOKOUT array keys: ' . print_r($frameDetails, true));
 
                         if ($frameDetails && 0 < count($frameDetails)) {
                             // NB There could be more than one render completed
