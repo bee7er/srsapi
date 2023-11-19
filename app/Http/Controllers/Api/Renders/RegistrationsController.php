@@ -23,6 +23,7 @@ class RegistrationsController extends Controller
     const APITOKEN = "apiToken";
     const AVAILABILITY = "availability";
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
+    const C4DPROJECTNAME = "c4dProjectName";
     const CUSTOMFRAMERANGE = "customFrameRange";
     const EMAIL = "email";
     const FILENAME = "fileName";
@@ -109,18 +110,19 @@ class RegistrationsController extends Controller
      */
     public function available(Request $request)
     {
+        $message = "Available notification received OK";
+        $result = null;
+        $actionInstruction = '';
+        $renderDetailId = 0;
+        $c4dProjectWithAssets = '';
+        $c4dProjectName = '';
+        $from = 0;
+        $to = 0;
+        $outputFormat = '';
+        $submittedByUserId = '';
+        $submittedByUserApiToken = '';
+        $renderId = '';
         try {
-            $message = "Available notification received OK";
-            $result = null;
-            $actionInstruction = '';
-            $renderDetailId = 0;
-            $c4dProjectWithAssets = '';
-            $from = 0;
-            $to = 0;
-            $outputFormat = '';
-            $submittedByUserId = '';
-            $submittedByUserApiToken = '';
-            $renderId = '';
 
             //Log::info('In available user for email: ' . $request->get(self::EMAIL));
 
@@ -131,7 +133,7 @@ class RegistrationsController extends Controller
                 $result = DB::table('render_details as rd')
                     ->select(
                         'rd.id', 'rd.status','rd.from','rd.to',
-                        'r.id as render_id','r.status as render_status','r.submitted_by_user_id','r.c4dProjectWithAssets','r.outputFormat',
+                        'r.id as render_id','r.status as render_status','r.submitted_by_user_id','r.c4dProjectWithAssets','r.c4dProjectName','r.outputFormat',
                         'u.id as submittedByUserId','u.api_token as submittedByUserApiToken'
                     )
                     ->join('renders as r', 'r.id', '=', 'rd.render_id')
@@ -170,6 +172,7 @@ class RegistrationsController extends Controller
                     Render::dataHasChanged($render->id, $user->id);
 
                     $c4dProjectWithAssets = $result->c4dProjectWithAssets;
+                    $c4dProjectName = $result->c4dProjectName;
                     $from = $result->from;
                     $to = $result->to;
                     $outputFormat = $result->outputFormat;
@@ -200,6 +203,7 @@ class RegistrationsController extends Controller
             self::ACTIONINSTRUCTION => $actionInstruction,
             self::RENDERDETAILID => $renderDetailId,
             self::C4DPROJECTWITHASSETS => $c4dProjectWithAssets,
+            self::C4DPROJECTNAME => $c4dProjectName,
             self::FROM => $from,
             self::TO => $to,
             self::OUTPUTFORMAT => $outputFormat,
@@ -221,14 +225,14 @@ class RegistrationsController extends Controller
      */
     public function awake(Request $request)
     {
+        $message = "Awake notification received OK";
+        $result = 'Error';
+        $actionInstruction = '';
+        $c4dProjectWithAssets = '';
+        $submissionsAndRenders = '';
+        $frameDetails = [];
+        $allocatedToUsers = [];
         try {
-            $message = "Awake notification received OK";
-            $result = 'Error';
-            $actionInstruction = '';
-            $c4dProjectWithAssets = '';
-            $submissionsAndRenders = '';
-            $frameDetails = [];
-            $allocatedToUsers = [];
 
             //Log::info('In awake user for email: ' . $request->get(self::EMAIL));
 

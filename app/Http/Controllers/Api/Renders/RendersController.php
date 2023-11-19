@@ -18,6 +18,7 @@ class RendersController extends Controller
     const APITOKEN = "apiToken";
     const EMAIL = "email";
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
+    const C4DPROJECTNAME = "c4dProjectName";
     const OUTPUTFORMAT = "outputFormat";
     const OVERRIDESETTINGS = "overrideSettings";
     const FROM = "from";
@@ -52,10 +53,10 @@ class RendersController extends Controller
      */
     public function render(Request $request)
     {
+        $message = "Data received OK";
+        $result = 'Error';
+        $renderId = 0;
         try {
-            $message = "Data received OK";
-            $result = 'Error';
-            $renderId = 0;
 
             // Write header and detail records to db
             //Log::info('In render for email: ' . $request->get(self::EMAIL));
@@ -69,6 +70,7 @@ class RendersController extends Controller
                 $render->submitted_by_user_id = $user->id;
                 $render->status = Render::OPEN;
                 $render->c4dProjectWithAssets = $request->get(self::C4DPROJECTWITHASSETS);
+                $render->c4dProjectName = $request->get(self::C4DPROJECTNAME);
                 $render->outputFormat = $request->get(self::OUTPUTFORMAT);
                 $render->from = $request->get(self::FROM);
                 $render->to = $request->get(self::TO);

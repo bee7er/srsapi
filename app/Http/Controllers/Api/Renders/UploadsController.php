@@ -14,6 +14,7 @@ class UploadsController extends Controller
 {
     const EMAIL = "email";
     const APITOKEN = "apiToken";
+    const C4DPROJECTNAME = "c4dProjectName";
     const RENDERID = "renderId";
     const SUBMITTEDBYUSERAPITOKEN = "submittedByUserApiToken";
 
