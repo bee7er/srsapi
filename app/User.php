@@ -23,6 +23,10 @@ class User extends Model implements AuthenticatableContract,
     const USER = 'user';
     const ROLES = [self::ADMIN, self::USER];
 
+    const AVAILABLE = 'available';
+    const RENDERING = 'rendering';
+    const UNAVAILABLE = 'unavailable';
+
     /**
      * The database table used by the model.
      *
@@ -56,7 +60,7 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    public static $statuses = ['available', 'unavailable', 'rendering'];
+    public static $statuses = [self::AVAILABLE, self::UNAVAILABLE, self::RENDERING];
 
     /**
      * Set the api_token after a valid registration.

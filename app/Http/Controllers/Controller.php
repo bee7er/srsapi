@@ -14,12 +14,14 @@ abstract class Controller extends BaseController
     const PAGE_AREA_HOME = 'home';
     const PAGE_AREA_PAGES = 'pages';
     const PAGE_AREA_RENDERS = 'renders';
+    const PAGE_AREA_TEAMS = 'teams';
     const PAGE_AREA_USERS = 'users';
 
     static $validPageAreas = [
         self::PAGE_AREA_HOME,
         self::PAGE_AREA_PAGES,
         self::PAGE_AREA_RENDERS,
+        self::PAGE_AREA_TEAMS,
         self::PAGE_AREA_USERS
     ];
 

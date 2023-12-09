@@ -76,3 +76,13 @@ table {
 .content p, .content li {
   font-size: 1.4em;
 }
+
+.available {
+  color: green;
+  font-weight: bold;
+}
+
+.unavailable {
+  color: darkred;
+  font-weight: bold;
+}

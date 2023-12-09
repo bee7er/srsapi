@@ -8,17 +8,21 @@ use Illuminate\Http\Request;
 Route::get('/', 'HomeController@index');
 
 Route::get('home', 'HomeController@index');
-Route::get('/home', 'HomeController@index');
-
-Route::get('renders', 'RendersController@index');
-Route::get('reassign', 'RendersController@reassign');
-Route::get('cancel', 'RendersController@cancel');
-
-Route::get('cookies', 'PagesController@cookies');
 
 // Make the following classes available in the views
 Route::resource('renders', 'RendersController');
 Route::resource('users', 'UsersController');
+Route::resource('teams', 'TeamsController');
+Route::resource('team_members', 'TeamMembersController');
+
+Route::get('cookies', 'PagesController@cookies');
+
+Route::get('reassign', 'RendersController@reassign');
+Route::get('cancel', 'RendersController@cancel');
+Route::get('remove', 'TeamMembersController@remove');
+Route::get('select', 'TeamMembersController@select');
+Route::get('add', 'TeamMembersController@add');
+Route::get('membership', 'TeamMembersController@membership');
 
 // Authentication, registering 2 controllers
 Route::controllers([
@@ -30,21 +34,7 @@ Route::controllers([
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application.
-|
 */
-
-//Route::middleware('auth.basic')->group(function () {
-//    Route::get('/', (new UsersController)->index());
-//});
-
-// No acrtual action associated with this invocation
-//Route::get('/', function () {
-//    return response()->json([
-//        'message' => 'Hello. The website is working.'
-//    ]);
-//});
 
 // Register a slave user node
 Route::post('/api1/register', function (Request $request) {
@@ -144,17 +134,3 @@ Route::get('/api1/test', function () {
         (new RendersController)->index()
     );
 });
-
-//Route::group(['middleware' => 'auth:basic'],function(){
-//    return response()->json(['data' => 'dddjjj']);
-//});
-
-//Route::middleware('auth.basic')->group(function () {
-//    Route::apiResource('books', BooksController::class);
-//});
-//
-//Route::get('/', function () {
-//    return response()->json([
-//        'message' => 'This is a simple example of item returned by your APIs. Everyone can see it.'
-//    ]);
-//});

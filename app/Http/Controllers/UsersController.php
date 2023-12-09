@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\TeamMember;
 use App\User;
 use App\Http\Requests;
 use Illuminate\Http\Request;
@@ -35,9 +36,9 @@ class UsersController extends Controller
         }
         // Get all the current users
         $users = User::all()->sortBy(['surname','first_name']);
+        $goBackTo = '/';
 
-
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users', 'goBackTo'));
     }
 
     /**
@@ -52,8 +53,9 @@ class UsersController extends Controller
         }
         $statuses = User::$statuses;
         $roles = User::ROLES;
+        $goBackTo = '/users';
 
-        return view('users.create', compact('statuses', 'roles'));
+        return view('users.create', compact('statuses', 'roles', 'goBackTo'));
     }
 
     /**
@@ -92,6 +94,20 @@ class UsersController extends Controller
             $user->setApiToken();
             $user->save();
 
+            $teamId = Input::get('teamId');
+            if (isset($teamId) && 0 < $teamId) {
+                // This user was created for a team, add as a member to the team
+                $teamMember = new TeamMember();
+                $teamMember->teamId = $teamId;
+                $teamMember->userId = $user->id;
+                $teamMember->status = TeamMember::ACTIVE;
+                $teamMember->save();
+
+                Session::flash('flash_message', 'Successfully created a new user for team');
+                Session::flash('flash_type', 'alert-success');
+                return redirect("teamMembers?id={$teamId}");
+            }
+
             Session::flash('flash_message', 'Successfully created a new user');
             Session::flash('flash_type', 'alert-success');
             return redirect('users');
@@ -108,8 +124,9 @@ class UsersController extends Controller
     {
         $user = User::where('id', $id)->first();
         $statuses = User::$statuses;
+        $goBackTo = '/users';
 
-        return view('users.show', compact('user', 'statuses'));
+        return view('users.show', compact('user', 'statuses', 'goBackTo'));
     }
 
     /**
@@ -124,8 +141,9 @@ class UsersController extends Controller
         $user = User::where('id', $id)->first();
         $statuses = User::$statuses;
         $roles = User::ROLES;
+        $goBackTo = '/users';
 
-        return view('users.edit', compact('user', 'statuses', 'roles'));
+        return view('users.edit', compact('user', 'statuses', 'roles', 'goBackTo'));
     }
 
     /**

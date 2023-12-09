@@ -75,24 +75,31 @@ class UploadsController extends Controller
     public function handleUploadProjects(Request $request)
     {
         try {
-            //Log::info('In handle upload projects: ' . print_r($request->all(), true));
+            Log::info('In handle upload projects: ' . print_r($request->all(), true));
 
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
                 $user->checkApiToken($request->get(self::APITOKEN));
 
                 if ($request->file()) {
+                    Log::info("Trying to receive uploaded file");
+
                     if (is_array($request->file())) {
+                        Log::info("Uploaded file seems to be there");
+
                         $saveToDir = "uploads/{$user->api_token}/projects/{$request->get(self::RENDERID)}";
                         if (!is_dir($saveToDir) && !mkdir($saveToDir)){
+                            Log::info("Could not make directory: {$saveToDir}");
+
                             throw new \Exception("Error creating folder {$saveToDir}");
                         }
                         foreach ($request->file() as $file) {
-//                            Log::info("File name: " . $file->getClientOriginalName());
-//                            Log::info("File path: " . $file->getPathname());
-//                            Log::info("Move to: uploads/{$user->api_token}/projects");
+                            Log::info("File name: " . $file->getClientOriginalName());
+                            Log::info("File path: " . $file->getPathname());
+                            Log::info("Move to: {$saveToDir}");
                             $file->move($saveToDir, $file->getClientOriginalName());
                         }
+                        Log::info("Move to succeeded: {$saveToDir}");
                     } else {
                         throw new \Exception("Received file is not an array");
                     }

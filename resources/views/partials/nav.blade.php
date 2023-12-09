@@ -12,6 +12,8 @@
                     <li class="@if ($menuOption == Controller::PAGE_AREA_RENDERS)active @endif srs-link">{!! link_to_action
                     ('RendersController@index', 'Renders', $parameters = [], $attributes = []) !!}</li>
                     @if (Auth::user()->isAdmin())
+                        <li class="@if ($menuOption == Controller::PAGE_AREA_TEAMS)active @endif srs-link" srs-link>{!! link_to_action
+                        ('TeamsController@index', 'Teams', $parameters = [], $attributes = []) !!}</li>
                         <li class="@if ($menuOption == Controller::PAGE_AREA_USERS)active @endif srs-link" srs-link>{!! link_to_action
                         ('UsersController@index', 'Users', $parameters = [], $attributes = []) !!}</li>
                     @endif

@@ -72,6 +72,11 @@
 
                             {!! Form::close() !!}
                         </div>
+                        <div class="panel-heading">
+                            <script>
+                                document.write('<a href="{{ $goBackTo }}"><- Go back</a>');
+                            </script>
+                        </div>
                     </div>
                 </div>
             </div>

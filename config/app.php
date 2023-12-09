@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'debug' => env('APP_DEBUG', false),
+    'debug' => env('APP_DEBUG', 0),
 
     /*
     |--------------------------------------------------------------------------
@@ -208,7 +208,6 @@ return [
         'Form'      => Illuminate\Html\FormFacade::class,
         'Html'      => Illuminate\Html\HtmlFacade::class,
         'Flash'     => Laracasts\Flash\Flash::class,
-        'RenderDetail' => App/RenderDetail::class,
     ],
 
 ];
