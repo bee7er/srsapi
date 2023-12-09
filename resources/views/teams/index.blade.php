@@ -41,7 +41,7 @@ use App\Team;
                                         <?php $background_color = ($background_color == $grey ? $blue: $grey); ?>
                                     @endforeach
                                 @else
-                                    <tr style="background-color: {!! $color !!};">
+                                    <tr style="background-color: {!! $background_color !!};">
                                         <td style="color: #c40000;font-weight: bold;" colspan="3"><p>No teams found</p></td>
                                     </tr>
                                 @endif

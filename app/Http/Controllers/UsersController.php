@@ -69,6 +69,7 @@ class UsersController extends Controller
         if (!Auth::user()->isAdmin()) {
             return redirect('/');
         }
+        $teamId = Input::get('teamId');
         // Read more on validation at http://laravel.com/docs/validation
         $rules = array(
             'first_name'            => 'required',
@@ -80,9 +81,16 @@ class UsersController extends Controller
         $validator = Validator::make(Input::all(), $rules);
 
         if ($validator->fails()) {
-            return redirect('users/create')
-                ->withErrors($validator)
-                ->withInput(Input::except('password'));
+            // NB We are sharing the user form between create for team members and normal user create
+            if (isset($teamId) && 0 < $teamId) {
+                return redirect('team_members/create?id=' . $teamId)
+                    ->withErrors($validator)
+                    ->withInput(Input::except('password'));
+            } else {
+                return redirect('users/create')
+                    ->withErrors($validator)
+                    ->withInput(Input::except('password'));
+            }
         } else {
             $user = new User();
             $user->status     = Input::get('status');
@@ -94,7 +102,6 @@ class UsersController extends Controller
             $user->setApiToken();
             $user->save();
 
-            $teamId = Input::get('teamId');
             if (isset($teamId) && 0 < $teamId) {
                 // This user was created for a team, add as a member to the team
                 $teamMember = new TeamMember();
@@ -105,7 +112,7 @@ class UsersController extends Controller
 
                 Session::flash('flash_message', 'Successfully created a new user for team');
                 Session::flash('flash_type', 'alert-success');
-                return redirect("teamMembers?id={$teamId}");
+                return redirect("team_members?id={$teamId}");
             }
 
             Session::flash('flash_message', 'Successfully created a new user');
