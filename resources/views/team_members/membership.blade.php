@@ -31,7 +31,7 @@ use App\TeamMember;
                                 @if (0 < count($teams))
                                     @foreach ($teams as $team)
                                         <tr style="background-color: {!! $background_color !!};">
-                                            <td class="">{{ $team->name }}</td>
+                                            <td class="">{!! link_to_action('TeamMembersController@index', $team->name, $parameters = ['id' => $team->teamId], $attributes = []) !!}</td>
                                             <td class="" style="text-align: center">{{ $team->teamStatus }}</td>
                                             <td class="" style="text-align: center">{{ $team->teamMemberStatus }}</td>
                                         </tr>

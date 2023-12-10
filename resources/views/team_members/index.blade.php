@@ -32,7 +32,7 @@ use App\TeamMember;
                                 @if (0 < count($teamMembers))
                                     @foreach ($teamMembers as $teamMember)
                                         <tr style="background-color: {!! $background_color !!};">
-                                            <td class="">{{ $teamMember->first_name }} {{ $teamMember->surname  }}</td>
+                                            <td class="">{!! link_to_action('TeamMembersController@membership', $teamMember->first_name . ' ' . $teamMember->surname, $parameters = ['userId' => $teamMember->userId], $attributes = []) !!}</td>
                                             <td class="">{!! $teamMember->teamMemberStatus !!}</td>
                                             <td style="text-align: center;">
                                                 {!! link_to_action('TeamMembersController@remove', 'Remove', $parameters = ['id' => $teamMember->teamMemberId, 'teamId' => $teamMember->teamId], $attributes = []) !!}
