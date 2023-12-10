@@ -15,13 +15,14 @@ use App\TeamMember;
                     <div class="panel panel-default">
                         <div class="panel-heading">List of Team Members</div>
                         <div class="panel-heading">Team: <span  style="color: #428bca;font-weight: bold;">{!! $team->name !!}</span></div>
+                        <div class="panel-heading">Status: <span  style="color: #428bca;font-weight: bold;">{!! $team->status !!}</span></div>
                         <div class="panel-body">
                             <div class="">{!! link_to_action('TeamMembersController@create', 'New Team Member', $parameters = ['id' => $teamId], $attributes = []) !!}</div>
 
                             <table cellpadding="2" cellspacing="2" width="100%">
                                 <tr>
                                     <th>Name</th>
-                                    <th>Status</th>
+                                    <th>Member Status</th>
                                     <th>Action</th>
                                 </tr>
 
@@ -33,7 +34,7 @@ use App\TeamMember;
                                     @foreach ($teamMembers as $teamMember)
                                         <tr style="background-color: {!! $background_color !!};">
                                             <td class="">{!! link_to_action('TeamMembersController@membership', $teamMember->first_name . ' ' . $teamMember->surname, $parameters = ['userId' => $teamMember->userId], $attributes = []) !!}</td>
-                                            <td class="">{!! $teamMember->teamMemberStatus !!}</td>
+                                            <td class="" style="text-align: center;">{!! link_to_action('TeamMembersController@toggleTeamMemberStatus', $teamMember->teamMemberStatus, $parameters = ['teamMemberId' => $teamMember->teamMemberId, 'teamId' => $teamMember->teamId], $attributes = ['title' => 'toggle']) !!}</td>
                                             <td style="text-align: center;">
                                                 {!! link_to_action('TeamMembersController@remove', 'Remove', $parameters = ['id' => $teamMember->teamMemberId, 'teamId' => $teamMember->teamId], $attributes = []) !!}
                                             </td>

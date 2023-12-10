@@ -51,7 +51,7 @@
                             </div>
 
                             <div class="form-group">
-                                {!! Form::label('status', 'Status', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::label('status', 'Render Status', ['class' => 'col-md-4 control-label']) !!}
                                 <select name="status">
                                     @foreach ($statuses as $status)
                                         <option value="{{ $status }}" {{ $user->status == $status ? 'selected="selected"' : '' }}>

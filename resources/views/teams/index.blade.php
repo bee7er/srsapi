@@ -31,7 +31,7 @@ use App\Team;
                                     @foreach ($teams as $team)
                                         <tr style="background-color: {!! $background_color !!};">
                                             <td class="">{!! $team->name !!}</td>
-                                            <td class="">{!! $team->status !!}</td>
+                                            <td class="">{!! link_to_action('TeamsController@toggleTeamStatus', $team->status, $parameters = ['id' => $team->id], $attributes = ['title' => 'toggle']) !!}</td>
                                             <td style="text-align: center;">
                                                 {!! link_to_action('TeamMembersController@index', 'Team Members', $parameters = ['id' => $team->id], $attributes = []) !!}
                                                 -
@@ -41,6 +41,7 @@ use App\Team;
                                         <?php $background_color = ($background_color == $grey ? $blue: $grey); ?>
                                     @endforeach
                                 @else
+                                    <tr style="background-color: {!! $background_color !!};">
                                     <tr style="background-color: {!! $background_color !!};">
                                         <td style="color: #c40000;font-weight: bold;" colspan="3"><p>No teams found</p></td>
                                     </tr>

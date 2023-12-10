@@ -23,6 +23,9 @@ Route::get('remove', 'TeamMembersController@remove');
 Route::get('select', 'TeamMembersController@select');
 Route::get('add', 'TeamMembersController@add');
 Route::get('membership', 'TeamMembersController@membership');
+Route::get('toggleTeamStatus', 'TeamsController@toggleTeamStatus');
+Route::get('toggleMembershipStatus', 'TeamMembersController@toggleMembershipStatus');
+Route::get('toggleTeamMemberStatus', 'TeamMembersController@toggleTeamMemberStatus');
 
 // Authentication, registering 2 controllers
 Route::controllers([

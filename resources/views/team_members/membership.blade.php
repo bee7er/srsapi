@@ -14,14 +14,14 @@ use App\TeamMember;
                 <div class="col-md-8 col-md-offset-2">
                     <div class="panel panel-default">
                         <div class="panel-heading">Team Membership</div>
-                        <div class="panel-heading">Team: <span  style="color: #428bca;font-weight: bold;">{!! $user->first_name !!} {!! $user->surname !!}</span></div>
+                        <div class="panel-heading">User: <span  style="color: #428bca;font-weight: bold;">{!! $user->first_name !!} {!! $user->surname !!}</span></div>
                         <div class="panel-body">
 
                             <table cellpadding="2" cellspacing="2" width="100%">
                                 <tr>
                                     <th>Team Name</th>
                                     <th>Team Status</th>
-                                    <th>User Membership Status</th>
+                                    <th>Member Status</th>
                                 </tr>
 
                                 <?php
@@ -33,7 +33,7 @@ use App\TeamMember;
                                         <tr style="background-color: {!! $background_color !!};">
                                             <td class="">{!! link_to_action('TeamMembersController@index', $team->name, $parameters = ['id' => $team->teamId], $attributes = []) !!}</td>
                                             <td class="" style="text-align: center">{{ $team->teamStatus }}</td>
-                                            <td class="" style="text-align: center">{{ $team->teamMemberStatus }}</td>
+                                            <td class="" style="text-align: center">{!! link_to_action('TeamMembersController@toggleMembershipStatus', $team->teamMemberStatus, $parameters = ['teamMemberId' => $team->teamMemberId, 'teamId' => $team->teamId], $attributes = ['title' => 'toggle']) !!}</td>
                                         </tr>
                                         <?php $background_color = ($background_color == $grey ? $blue: $grey); ?>
                                     @endforeach

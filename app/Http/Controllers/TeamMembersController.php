@@ -206,7 +206,7 @@ class TeamMembersController extends Controller
             ->select(
                 'tm.id as teamMemberId','tm.teamId','tm.userId','tm.status as teamMemberStatus',
                 't.id as teamId','t.status as teamStatus','t.name',
-                'u.surname','u.first_name'
+                'u.id as userId','u.surname','u.first_name'
             )
             ->join('teams as t', 't.id', '=', 'tm.teamId')
             ->leftjoin('users as u', 'u.id', '=', 'tm.userId')
@@ -220,5 +220,66 @@ class TeamMembersController extends Controller
         return view('team_members.membership', compact('teams', 'user', 'goBackTo'));
     }
 
+    /**
+     * Toggles the membership status of a given user
+     *
+     * @return \Illuminate\View\View
+     */
+    public function toggleTeamMemberStatus()
+    {
+        list($teamId, $userId) = $this->toggleStatus();
+
+        return redirect("team_members?id=$teamId");
+    }
+
+    /**
+     * Toggles the membership status of a given user
+     *
+     * @return \Illuminate\View\View
+     */
+    public function toggleMembershipStatus()
+    {
+        list($teamId, $userId) = $this->toggleStatus();
+
+        return redirect("membership?userId=$userId");
+    }
+
+    /**
+     * Toggles the membership status of a given user
+     *
+     * @return \Illuminate\View\View
+     */
+    private function toggleStatus()
+    {
+        if (!Auth::user()->isAdmin()) {
+            return redirect('/');
+        }
+
+        $teamId = Input::get('teamId');
+        $team = Team::find($teamId);
+        if (!$team) {
+            Session::flash('flash_message', 'Could not find team for id ' . $teamId);
+            Session::flash('flash_type', 'alert-danger');
+            return redirect("team_members?id=$teamId");
+        }
+
+        $teamMemberId = Input::get('teamMemberId');
+        $teamMember = TeamMember::find($teamMemberId);
+        if (!$teamMember) {
+            Session::flash('flash_message', 'Could not find team member for id ' . $teamMemberId);
+            Session::flash('flash_type', 'alert-danger');
+            return redirect("team_members?id=$teamId");
+        }
+
+        // Toggle user status in this team
+        $newStatus = $teamMember->status == TeamMember::ACTIVE ? TeamMember::INACTIVE : TeamMember::ACTIVE;
+        $teamMember->status = $newStatus;
+        $teamMember->save();
+
+        Session::flash('flash_message', "Successfully changed user member status to {$newStatus} for team {$team->name}");
+        Session::flash('flash_type', 'alert-success');
+
+        return [$teamId, $teamMember->userId];
+    }
 
 }

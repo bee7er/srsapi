@@ -194,4 +194,34 @@ class TeamsController extends Controller
         }
         return redirect('teams');
     }
+
+    /**
+     * Toggles the status of a given team
+     *
+     * @return \Illuminate\View\View
+     */
+    public function toggleTeamStatus()
+    {
+        if (!Auth::user()->isAdmin()) {
+            return redirect('/');
+        }
+
+        $id = Input::get('id');
+        $team = Team::find($id);
+        if (!$team) {
+            Session::flash('flash_message', 'Could not find team for id ' . $id);
+            Session::flash('flash_type', 'alert-danger');
+            return redirect("teams");
+        }
+
+        // Toggle team status
+        $newStatus = $team->status == Team::ACTIVE ? Team::INACTIVE : Team::ACTIVE;
+        $team->status = $newStatus;
+        $team->save();
+
+        Session::flash('flash_message', "Successfully changed team status to {$newStatus} for team {$team->name}");
+        Session::flash('flash_type', 'alert-success');
+
+        return redirect("teams");
+    }
 }

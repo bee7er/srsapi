@@ -15,7 +15,7 @@
                             <table cellpadding="2" cellspacing="2" width="100%">
                                 <tr>
                                     <th>Name</th>
-                                    <th>Status</th>
+                                    <th>Render Status</th>
                                     <th>Action</th>
                                 </tr>
 
