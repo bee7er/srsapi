@@ -25,7 +25,7 @@
                 {{--LoggedInUser is needed on every page. Defined in a view composer.--}}
                 @if (!$loggedInUser)<li><a href="{!! url('auth/login', $parameters = [], $attributes = [])
                 !!}">Login</a></li>@endif
-                @if ($loggedInUser)<li>{!! link_to_action('UsersController@show', (ucfirst($loggedInUser->first_name)), $parameters = ['id' => $loggedInUser->id], $attributes = []) !!}</li>@endif
+                @if ($loggedInUser)<li>{!! link_to_action('UsersController@show', (ucfirst($loggedInUser->userName)), $parameters = ['id' => $loggedInUser->id], $attributes = []) !!}</li>@endif
                 @if ($loggedInUser)<li><a href="{!! url('auth/logout', $parameters = [], $attributes = [])
                 !!}">Logout</a></li>@endif
                 {{--@if (!$loggedInUser)<li><a href="{!! url('auth/register', $parameters = [], $attributes = [])--}}

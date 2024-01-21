@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Team;
 use App\Http\Requests;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -33,7 +34,7 @@ class TeamsController extends Controller
             return redirect('/');
         }
         // Get all the current teams
-        $teams = Team::all()->sortBy(['name']);
+        $teams = Team::all()->sortBy(['teamName']);
         $goBackTo = '/';
 
         return view('teams.index', compact('teams','goBackTo'));
@@ -68,8 +69,7 @@ class TeamsController extends Controller
         }
         // Read more on validation at http://laravel.com/docs/validation
         $rules = array(
-            'name'            => 'required',
-            'description'     => 'required'
+            'teamName'        => 'required'
         );
         $validator = Validator::make(Input::all(), $rules);
 
@@ -78,9 +78,11 @@ class TeamsController extends Controller
                 ->withErrors($validator);
         } else {
             $team = new Team();
-            $team->name        = Input::get('name');
-            $team->description = Input::get('description');
-            $team->status      = Input::get('status');
+            $team->setTeamToken();
+            $team->teamName        = Input::get('teamName');
+            $team->createdByUserId = Auth::user()->id;
+            $team->description     = Input::get('description');
+            $team->status          = Input::get('status');
             $team->save();
 
             Session::flash('flash_message', 'Successfully created a new team');
@@ -102,9 +104,10 @@ class TeamsController extends Controller
         }
         $team = Team::where('id', $id)->first();
         $statuses = Team::$statuses;
+        $createdByUser = User::where('id', $team->createdByUserId)->first();
         $goBackTo = '/teams';
 
-        return view('teams.show', compact('team', 'statuses', 'goBackTo'));
+        return view('teams.show', compact('team', 'statuses', 'createdByUser', 'goBackTo'));
     }
 
     /**
@@ -120,9 +123,10 @@ class TeamsController extends Controller
         }
         $team = Team::where('id', $id)->first();
         $statuses = Team::$statuses;
+        $createdByUser = User::where('id', $team->createdByUserId)->first();
         $goBackTo = '/teams';
 
-        return view('teams.edit', compact('team', 'statuses', 'goBackTo'));
+        return view('teams.edit', compact('team', 'statuses', 'createdByUser', 'goBackTo'));
     }
 
     /**
@@ -138,8 +142,7 @@ class TeamsController extends Controller
         }
         // Read more on validation at http://laravel.com/docs/validation
         $rules = array(
-            'name'            => 'required',
-            'description'     => 'required'
+            'teamName'        => 'required'
         );
         $validator = Validator::make(Input::all(), $rules);
 
@@ -153,7 +156,7 @@ class TeamsController extends Controller
                 return redirect("teams/$id/edit")
                     ->withErrors($validator);
             }
-            $team->name        = Input::get('name');
+            $team->teamName    = Input::get('teamName');
             $team->description = Input::get('description');
             $team->status      = Input::get('status');
             $team->save();
@@ -219,7 +222,7 @@ class TeamsController extends Controller
         $team->status = $newStatus;
         $team->save();
 
-        Session::flash('flash_message', "Successfully changed team status to {$newStatus} for team {$team->name}");
+        Session::flash('flash_message', "Successfully changed team status to {$newStatus} for team {$team->teamName}");
         Session::flash('flash_type', 'alert-success');
 
         return redirect("teams");

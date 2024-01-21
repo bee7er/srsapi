@@ -25,7 +25,7 @@
                                             <option value="0" @if (0 == $selectedUserId) selected @endif>All</option>
                                         @endif
                                         @foreach ($users as $optionUser)
-                                            <option value="{!! $optionUser->id !!}" @if ($optionUser->id == $selectedUserId) selected @endif>{!! $optionUser->first_name . ' ' . $optionUser->surname !!}</option>
+                                            <option value="{!! $optionUser->id !!}" @if ($optionUser->id == $selectedUserId) selected @endif>{!! $optionUser->userName !!}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -75,7 +75,7 @@
                                                 <td class="{!! $render->render_status !!}">{!! $render->render_status !!}</td>
                                                 <td class="">{!! $render->from !!}-{!! $render->to !!}</td>
                                                 <td class="{!! $render->detail_status !!}">{!! $render->detail_status !!}</td>
-                                                <td>{!! $render->first_name !!} {!! $render->surname !!}</td>
+                                                <td>{!! $render->userName !!}</td>
                                                 <td>{!! date('d/m/Y H:i', strtotime($render->created_at)) !!}</td>
                                                 <td>{!! ($render->completed_at ? date('d/m/Y H:i', strtotime($render->completed_at)): '') !!}</td>
                                                 <td style="text-align: center;" title="Render detail id: {!! $render->render_detail_id !!}">
@@ -92,7 +92,7 @@
                                         @endforeach
                                     @else
                                         <tr style="background-color: {!! $color !!};">
-                                            <td colspan="9"><p>No renders found</p></td>
+                                            <td style="color: #c40000;font-weight: bold;font-size: 70%;" colspan="9"><p>No renders found</p></td>
                                         </tr>
                                     @endif
                                 </table>
@@ -125,7 +125,7 @@
                                                 <td class="{!! $render->render_status !!}">{!! $render->render_status !!}</td>
                                                 <td class="">{!! $render->from !!}-{!! $render->to !!}</td>
                                                 <td class="{!! $render->detail_status !!}">{!! $render->detail_status !!}</td>
-                                                <td>{!! $render->first_name !!} {!! $render->surname !!}</td>
+                                                <td>{!! $render->userName !!}</td>
                                                 <td>{!! date('d/m/Y H:i', strtotime($render->created_at)) !!}</td>
                                                 <td>{!! ($render->completed_at ? date('d/m/Y H:i', strtotime($render->completed_at)): '') !!}</td>
                                                 <td style="text-align: center;" title="Render detail id: {!! $render->render_detail_id !!}">

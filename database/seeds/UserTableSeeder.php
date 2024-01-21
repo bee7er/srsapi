@@ -15,15 +15,15 @@ class UserTableSeeder extends Seeder
     {
         DB::table('users')->delete();
 
-        User::create(['first_name' => 'brian',
-            'surname' => 'etheridge',
+        User::create([
+            'name' => 'etheridge',
             'email' => 'betheridge@gmail.com',
             'password' =>  Hash::make('password'),
             'role' =>  'admin',
             'status' =>  'available']);
 
-        User::create(['first_name' => 'barry',
-            'surname' => 'fiddlestone',
+        User::create([
+            'name' => 'fiddlestone',
             'email' => 'contact_bee@yahoo.com',
             'password' =>  Hash::make('password'),
             'role' =>  'admin',

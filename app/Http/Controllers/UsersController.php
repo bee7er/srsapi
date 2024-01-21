@@ -35,7 +35,7 @@ class UsersController extends Controller
             return redirect('/');
         }
         // Get all the current users
-        $users = User::all()->sortBy(['surname','first_name']);
+        $users = User::all()->sortBy(['userName']);
         $goBackTo = '/';
 
         return view('users.index', compact('users', 'goBackTo'));
@@ -72,9 +72,7 @@ class UsersController extends Controller
         $teamId = Input::get('teamId');
         // Read more on validation at http://laravel.com/docs/validation
         $rules = array(
-            'first_name'            => 'required',
-            'surname'               => 'required',
-            'email'                 => 'required|email|unique:users,email',
+            'userName'              => 'required',
             'password'              => 'required|min:6|confirmed',
             'password_confirmation' => ''
         );
@@ -94,12 +92,12 @@ class UsersController extends Controller
         } else {
             $user = new User();
             $user->status     = Input::get('status');
-            $user->role     = Input::get('role');
-            $user->first_name = Input::get('first_name');
-            $user->surname    = Input::get('surname');
-            $user->email      = Input::get('email');
+            $user->role       = Input::get('role');
+            $user->userName   = Input::get('userName');
+            $user->user_token = $user->getNewToken();
+            // This generated email s guaranteed to be unique.  User can change it later.
+            $user->email      = ($user->user_token . '@' . User::DOMIAN);
             $user->password   = Hash::make(Input::get('password'));
-            $user->setApiToken();
             $user->save();
 
             if (isset($teamId) && 0 < $teamId) {
@@ -162,11 +160,11 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-// Read more on validation at http://laravel.com/docs/validation
+        // Read more on validation at http://laravel.com/docs/validation
+        // User can change their email, but it needs to be unique
         $rules = array(
-            'first_name'            => 'required',
-            'surname'               => 'required',
-            'email'                 => 'required|email'
+            'userName'              => 'required',
+            'email'                 => 'required|email|unique:users,email'
         );
         $validator = Validator::make(Input::all(), $rules);
 
@@ -183,9 +181,8 @@ class UsersController extends Controller
                     ->withInput(Input::except('password'));
             }
             $user->status     = Input::get('status');
-            $user->role     = (Input::get('role') ? : $user->role);
-            $user->first_name = Input::get('first_name');
-            $user->surname    = Input::get('surname');
+            $user->role       = (Input::get('role') ? : $user->role);
+            $user->userName   = Input::get('userName');
             $user->email      = Input::get('email');
             $user->save();
 

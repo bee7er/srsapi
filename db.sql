@@ -34,7 +34,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES ('2022_11_19_000000_create_users_table',1),('2022_11_19_100000_create_password_resets_table',1),('2022_11_19_200000_create_renders_table',1),('2022_11_19_300000_create_render_details_table',1),('2023_01_16_100000_add_api_token_users_table',2),('2023_02_03_100000_add_data_changed_users_table',3);
+INSERT INTO `migrations` VALUES ('2022_11_19_000000_create_users_table',1),('2022_11_19_100000_create_password_resets_table',1),('2022_11_19_200000_create_renders_table',1),('2022_11_19_300000_create_render_details_table',1),('2023_01_16_100000_add_user_token_users_table',2),('2023_02_03_100000_add_data_changed_users_table',3);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -146,13 +146,13 @@ CREATE TABLE `users` (
   `status` enum('available','unavailable','rendering') COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
   `data_changed` tinyint(1) DEFAULT NULL,
-  `api_token` varchar(80) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_token` varchar(80) COLLATE utf8_unicode_ci DEFAULT NULL,
   `remember_token` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`),
-  UNIQUE KEY `users_api_token_unique` (`api_token`)
+  UNIQUE KEY `users_user_token_unique` (`user_token`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

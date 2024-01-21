@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\BlockedUser;
 use App\User;
 use App\Team;
 use App\TeamMember;
@@ -48,15 +49,14 @@ class TeamMembersController extends Controller
             ->select(
                 'tm.id as teamMemberId','tm.teamId','tm.userId','tm.status as teamMemberStatus',
                 't.id as teamId','t.status as teamStatus',
-                'u.surname','u.first_name'
+                'u.id as userId','u.userName','u.email','u.user_token'
             )
             ->join('teams as t', 't.id', '=', 'tm.teamId')
             ->leftjoin('users as u', 'u.id', '=', 'tm.userId')
             ->where(['tm.teamId' => $teamId]);
 
         $teamMembers = $builder
-            ->orderBy('u.surname', 'ASC')
-            ->orderBy('u.first_name', 'ASC')
+            ->orderBy('u.userName', 'ASC')
             ->get();
         $goBackTo = '/teams';
 
@@ -131,13 +131,12 @@ class TeamMembersController extends Controller
 
         $builder = DB::table('users as u')
             ->select(
-                'u.id', 'u.surname','u.first_name'
+                'u.id', 'u.userName','u.email','u.user_token'
             )
             ->whereNotIn('id', objectsAttributeToArray(DB::table('team_members')->select('userId')->where('teamId', '=', $teamId)->get(), 'userId'));
 
         $users = $builder
-            ->orderBy('u.surname', 'ASC')
-            ->orderBy('u.first_name', 'ASC')
+            ->orderBy('u.userName', 'ASC')
             ->get();
         $goBackTo = '/team_members?id=' . $teamId;
 
@@ -205,17 +204,39 @@ class TeamMembersController extends Controller
         $builder = DB::table('team_members as tm')
             ->select(
                 'tm.id as teamMemberId','tm.teamId','tm.userId','tm.status as teamMemberStatus',
-                't.id as teamId','t.status as teamStatus','t.name',
-                'u.id as userId','u.surname','u.first_name'
+                't.id as teamId','t.status as teamStatus','t.teamName',
+                'u.id as userId','u.userName','u.email','u.user_token'
             )
             ->join('teams as t', 't.id', '=', 'tm.teamId')
             ->leftjoin('users as u', 'u.id', '=', 'tm.userId')
             ->where(['tm.userId' => $userId]);
 
         $teams = $builder
-            ->orderBy('t.name', 'ASC')
+            ->orderBy('t.teamName', 'ASC')
             ->get();
         $goBackTo = '/users';
+
+        // Add other members for each team
+        foreach ($teams as $team) {
+            $builder = DB::table('team_members as tm')
+                ->select('tm.id as teamMemberId','tm.teamId','u.id as userId','u.userName')
+                ->leftjoin('users as u', 'u.id', '=', 'tm.userId')
+                ->where(['tm.teamId' => $team->teamId])
+                ->where('u.id','!=', $userId);
+
+            $otherTeamMembers = $builder
+                ->orderBy('u.userName', 'ASC')
+                ->get();
+
+            foreach ($otherTeamMembers as &$otherTeamMember) {
+                $otherTeamMember->isBlocked = false;
+                if (BlockedUser::where(['teamId' => $otherTeamMember->teamId,'userId' => $userId,'blockedUserId' => $otherTeamMember->userId])->exists()) {
+                    $otherTeamMember->isBlocked = true;
+                }
+            }
+
+            $team->otherTeamMembers = $otherTeamMembers;
+        }
 
         return view('team_members.membership', compact('teams', 'user', 'goBackTo'));
     }
@@ -276,10 +297,42 @@ class TeamMembersController extends Controller
         $teamMember->status = $newStatus;
         $teamMember->save();
 
-        Session::flash('flash_message', "Successfully changed user member status to {$newStatus} for team {$team->name}");
+        Session::flash('flash_message', "Successfully changed user member status to {$newStatus} for team {$team->teamName}");
         Session::flash('flash_type', 'alert-success');
 
         return [$teamId, $teamMember->userId];
     }
+
+    /**
+     * Block or unblock a user for the given user/team
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function toggleBlockedUserStatus(Request $request)
+    {
+        // Block the target user, if not already blocked
+        $userId = $request->get('userId');
+        $teamId = $request->get('teamId');
+        $blockedUserId = $request->get('blockedUserId');
+        $blockedUser = BlockedUser::where(['userId'=>$userId, 'teamId'=>$teamId, 'blockedUserId'=>$blockedUserId])->first();
+        if ($blockedUser) {
+            // Remove it
+            $blockedUser->delete();
+            Session::flash('flash_message', 'Successfully unblocked user');
+        } else {
+            // Add it
+            $blockedUser = new BlockedUser();
+            $blockedUser->userId        = $userId;
+            $blockedUser->teamId        = $teamId;
+            $blockedUser->blockedUserId = $blockedUserId;
+            $blockedUser->save();
+            Session::flash('flash_message', 'Successfully blocked user');
+        }
+        Session::flash('flash_type', 'alert-success');
+
+        return redirect("membership?userId=" . $userId);
+    }
+
 
 }

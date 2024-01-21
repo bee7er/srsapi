@@ -39,7 +39,7 @@ class RenderDetail extends Model
                 'rd.id as render_detail_id','rd.status as detail_status','rd.allocated_to_user_id','rd.from','rd.to',
                 'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat',
                 'r.created_at','r.completed_at',
-                'u.surname','u.first_name'
+                'u.userName'
             )
             ->join('renders as r', 'r.id', '=', 'rd.render_id')
             ->leftjoin('users as u', 'u.id', '=', 'rd.allocated_to_user_id');
@@ -67,7 +67,7 @@ class RenderDetail extends Model
                 'rd.id as render_detail_id','rd.status as detail_status','rd.allocated_to_user_id','rd.from','rd.to',
                 'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat',
                 'r.created_at','r.completed_at',
-                'u.surname','u.first_name'
+                'u.userName'
             )
             ->join('renders as r', 'r.id', '=', 'rd.render_id')
             ->join('users as u', 'u.id', '=', 'r.submitted_by_user_id');
@@ -104,8 +104,8 @@ class RenderDetail extends Model
         list($submissions, $renders) = self::getSubmissionsAndRenders($submittedByUserId);
         $availableUsers = User::getAvailableUsers();
         $html = '<table style="font-size:11px;width:100%;">';
-        $html .= '<tr><td colspan="4" style="font-size:16px;font-weight:bold;">Team Members Currently Available</td></tr>';
-        $html .= "<tr><th>Surname</th><th>First Name</th><th>Email</th><th>Status</th></tr>";
+        $html .= '<tr><td colspan="3" style="font-size:16px;font-weight:bold;">Team Members Currently Available</td></tr>';
+        $html .= "<tr><th>User name</th><th>Email</th><th>Status</th></tr>";
         $entryCount = 0;
 
         $color = $grey = '#d8d8d8';
@@ -116,11 +116,10 @@ class RenderDetail extends Model
                 // Highlight the user when they are available
                 if ($availableUser->id == $submittedByUserId) {
                     $color = '#a851d6';
-                    $availableUser->surname = 'You';
-                    $availableUser->first_name = '';
+                    $availableUser->userName = 'You';
                 }
                 // Build a row with this information
-                $html .= "<tr style=\"background-color: {$color};\"><td>{$availableUser->surname}</td><td>{$availableUser->first_name}</td><td>{$availableUser->email}</td><td>{$availableUser->status}</td></tr>";
+                $html .= "<tr style=\"background-color: {$color};\"><td>{$availableUser->userName}</td><td>{$availableUser->email}</td><td>{$availableUser->status}</td></tr>";
                 $color = ($color == $grey ? $blue: $grey);
             }
         } else {
@@ -138,7 +137,7 @@ class RenderDetail extends Model
             foreach ($submissions as $submission) {
                 $entryCount++;
                 // Build a row with this information
-                $html .= "<tr style=\"background-color: {$color};\"><td>{$submission->c4dProjectWithAssets}</td><td>{$submission->from} to {$submission->to}</td><td>{$submission->first_name} {$submission->surname}</td><td>{$submission->detail_status}</td></tr>";
+                $html .= "<tr style=\"background-color: {$color};\"><td>{$submission->c4dProjectWithAssets}</td><td>{$submission->from} to {$submission->to}</td><td>{$submission->userName}</td><td>{$submission->detail_status}</td></tr>";
                 $color = ($color == $grey ? $blue: $grey);
             }
         } else {
@@ -156,7 +155,7 @@ class RenderDetail extends Model
             foreach ($renders as $render) {
                 $entryCount++;
                 // Build a row with this information
-                $html .= "<tr style=\"background-color: {$color};\"><td>{$render->c4dProjectWithAssets}</td><td>{$render->from} to {$render->to}</td><td>{$render->first_name} {$render->surname}</td><td>{$render->detail_status}</td></tr>";
+                $html .= "<tr style=\"background-color: {$color};\"><td>{$render->c4dProjectWithAssets}</td><td>{$render->from} to {$render->to}</td><td>{$render->userName}</td><td>{$render->detail_status}</td></tr>";
                 $color = ($color == $grey ? $blue: $grey);
             }
         } else {
@@ -181,7 +180,7 @@ class RenderDetail extends Model
             ->select(
                 'rd.id','rd.status','rd.allocated_to_user_id','rd.from','rd.to',
                 'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat',
-                'u.id as submittedByUserId','u.api_token as submittedByUserApiToken'
+                'u.id as submittedByUserId','u.user_token as submittedByUserToken'
             )
             ->join('renders as r', 'r.id', '=', 'rd.render_id')
             ->join('users as u', 'u.id', '=', 'r.submitted_by_user_id')

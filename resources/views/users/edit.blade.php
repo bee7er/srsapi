@@ -36,13 +36,8 @@
                             @endif
 
                             <div class="form-group">
-                                {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('first_name', $user->first_name, ['class' => 'col-md-6']) !!}
-                            </div>
-
-                            <div class="form-group">
-                                {!! Form::label('surname', 'Surname', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('surname', $user->surname, ['class' => 'col-md-6']) !!}
+                                {!! Form::label('userName', 'User name', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('userName', $user->userName, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">

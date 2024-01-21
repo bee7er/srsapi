@@ -19,6 +19,8 @@ class User extends Model implements AuthenticatableContract,
 {
     use Authenticatable, Authorizable, CanResetPassword;
 
+    const DOMIAN = 'powerhouse.industries';
+
     const ADMIN = 'admin';
     const USER = 'user';
     const ROLES = [self::ADMIN, self::USER];
@@ -46,7 +48,7 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['first_name', 'surname', 'email', 'password', 'status', 'role'];
+    protected $fillable = ['userName', 'email', 'password', 'status', 'role'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -63,33 +65,43 @@ class User extends Model implements AuthenticatableContract,
     public static $statuses = [self::AVAILABLE, self::UNAVAILABLE, self::RENDERING];
 
     /**
-     * Set the api_token after a valid registration.
+     * Get a new, unique user_token.
      */
-    public function setApiToken()
+    public function getNewToken()
     {
-        $this->api_token = Str::random(80);
+        $token = null;
+        // Try to get a unique token
+        for ($i=0; $i<10; $i++) {
+            $token = Str::random(16);
+            // Check the token is unique
+            $user = User::where('user_token', $token)->first();
+            if (!$user) {
+                return $token;  // Ok, is unique
+            }
+        }
+        throw new \Exception("Could not generate a unique token for new user");
     }
 
     /**
-     * Check the api_token has been provided and is valid
+     * Check the user_token has been provided and is valid
      *
-     * @param $apiToken
+     * @param $userToken
      */
-    public function checkApiToken($apiToken)
+    public function checkUserToken($userToken)
     {
-        if (!isset($apiToken)) {
+        if (!isset($userToken)) {
             throw new \Exception('API authentication not provided');
         }
-        if ($apiToken !== $this->api_token) {
+        if ($userToken !== $this->user_token) {
             throw new \Exception('API authentication is invalid');
         }
     }
 
     /**
-     * Build and return user name
+     * Return user name
      */
     public function getName() {
-        return $this->first_name . ' ' . $this->surname;
+        return $this->userName;
     }
 
     /**
@@ -108,12 +120,12 @@ class User extends Model implements AuthenticatableContract,
     {
         $builder = DB::table('users as u')
             ->select(
-                'u.id','u.surname','u.first_name','u.email','u.status'
+                'u.id','u.userName','u.email','u.status'
             )
             ->where('u.status', '=', 'available');
 
         $users = $builder
-            ->orderBy('u.surname', 'ASC')
+            ->orderBy('u.userName', 'ASC')
             ->get();
 
         return $users;

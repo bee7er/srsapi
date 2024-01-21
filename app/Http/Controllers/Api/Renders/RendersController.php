@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Renders;
 use App\Http\Controllers\Controller;
 use App\Render;
 use App\RenderDetail;
+use App\Team;
+use App\TeamMember;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,7 +17,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class RendersController extends Controller
 {
     // Parameters
-    const APITOKEN = "apiToken";
+    const TEAMTOKEN = "teamToken";
+    const USERTOKEN = "userToken";
     const EMAIL = "email";
     const C4DPROJECTWITHASSETS = "c4dProjectWithAssets";
     const C4DPROJECTNAME = "c4dProjectName";
@@ -63,7 +66,15 @@ class RendersController extends Controller
 
             $user = User::where('email', $request->get(self::EMAIL))->first();
             if ($user) {
-                $user->checkApiToken($request->get(self::APITOKEN));
+                $user->checkUserToken($request->get(self::USERTOKEN));
+
+                // Check the team token, is valid and the user is an active member
+                $teamToken = $request->get(self::TEAMTOKEN);
+                $team = Team::where('token', $teamToken) -> first();
+                if (!$team) {
+                    throw new \Exception("Team not found for token '{$teamToken}'");
+                }
+                TeamMember::checkTeamMembership($user->id, $team->id);
 
                 // Create a new Render record
                 $render = new Render();

@@ -14,8 +14,8 @@
                             {!! Form::open(['url' => 'teams', 'class' => 'form-horizontal']) !!}
 
                             <div class="form-group">
-                                {!! Form::label('name', 'Name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('name', null, ['class' => 'col-md-6']) !!}
+                                {!! Form::label('teamName', 'Team name', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('teamName', null, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">

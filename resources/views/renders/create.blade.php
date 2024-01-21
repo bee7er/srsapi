@@ -14,13 +14,8 @@
                             {!! Form::open(['url' => 'renders', 'class' => 'form-horizontal']) !!}
 
                             <div class="form-group">
-                                {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('first_name', null, ['class' => 'col-md-6']) !!}
-                            </div>
-
-                            <div class="form-group">
-                                {!! Form::label('surname', 'Surname', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('surname', null, ['class' => 'col-md-6']) !!}
+                                {!! Form::label('userName', 'User name', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('userName', null, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">

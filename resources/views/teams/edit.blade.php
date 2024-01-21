@@ -15,8 +15,18 @@
                             {!! Form::hidden('id', $team->id) !!}
 
                             <div class="form-group">
-                                {!! Form::label('name', 'Name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('name', $team->name, ['class' => 'col-md-6']) !!}
+                                {!! Form::label('token', 'Team token', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('token', $team->token, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
+                            </div>
+
+                            <div class="form-group">
+                                {!! Form::label('createdByUser', 'Created by', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('createdByUser', $createdByUser->userName, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
+                            </div>
+
+                            <div class="form-group">
+                                {!! Form::label('teamName', 'Team name', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('teamName', $team->teamName, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">

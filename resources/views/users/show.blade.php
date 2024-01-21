@@ -27,13 +27,8 @@
                             @endif
 
                             <div class="form-group">
-                                {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('first_name', $user->first_name, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
-                            </div>
-
-                            <div class="form-group">
-                                {!! Form::label('surname', 'Surname', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('surname', $user->surname, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
+                                {!! Form::label('userName', 'User name', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('userName', $user->userName, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">
@@ -42,8 +37,8 @@
                             </div>
 
                             <div class="form-group">
-                                {!! Form::label('api_token', 'API token', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('api_token', $user->api_token, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
+                                {!! Form::label('user_token', 'API token', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('user_token', $user->user_token, ['disabled' => 'disabled', 'class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">

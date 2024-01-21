@@ -55,7 +55,7 @@ class RendersController extends Controller
                 $builder->where('u.id', Auth::user()->id);
             }
             $users = $builder
-                ->orderBy('u.surname', 'u.first_name')
+                ->orderBy('u.userName')
                 ->get();
 
             list($submissions, $renders) = RenderDetail::getSubmissionsAndRenders($selectedUserId, $includeReturned);

@@ -5,7 +5,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">New User Profile</div>
                             @if (isset($team))
-                            <div class="panel-heading">For team: <span  style="color: #428bca;font-weight: bold;">{!! $team->name !!}</span></div>
+                            <div class="panel-heading">For team: <span  style="color: #428bca;font-weight: bold;">{!! $team->teamName !!}</span></div>
                             @endif
                         <div class="panel-body">
 
@@ -26,18 +26,8 @@
                             </div>
 
                             <div class="form-group">
-                                {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('first_name', null, ['class' => 'col-md-6']) !!}
-                            </div>
-
-                            <div class="form-group">
-                                {!! Form::label('surname', 'Surname', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('surname', null, ['class' => 'col-md-6']) !!}
-                            </div>
-
-                            <div class="form-group">
-                                {!! Form::label('email', 'Email', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('email', null, ['class' => 'col-md-6']) !!}
+                                {!! Form::label('userName', 'User name', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('userName', null, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">

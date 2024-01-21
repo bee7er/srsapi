@@ -18,6 +18,7 @@ use App\Team;
 
                             <table cellpadding="2" cellspacing="2" width="100%">
                                 <tr>
+                                    <th>Team Token</th>
                                     <th>Name</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -30,20 +31,20 @@ use App\Team;
                                 @if (0 < count($teams))
                                     @foreach ($teams as $team)
                                         <tr style="background-color: {!! $background_color !!};">
-                                            <td class="">{!! $team->name !!}</td>
+                                            <td class="">{!! $team->token !!}</td>
+                                            <td class="">{!! $team->teamName !!}</td>
                                             <td class="">{!! link_to_action('TeamsController@toggleTeamStatus', $team->status, $parameters = ['id' => $team->id], $attributes = ['title' => 'toggle']) !!}</td>
                                             <td style="text-align: center;">
-                                                {!! link_to_action('TeamMembersController@index', 'Team Members', $parameters = ['id' => $team->id], $attributes = []) !!}
+                                                {!! link_to_action('TeamMembersController@index', 'team members', $parameters = ['id' => $team->id], $attributes = []) !!}
                                                 -
-                                                {!! link_to_action('TeamsController@show', 'Details', $parameters = ['id' => $team->id], $attributes = []) !!}
+                                                {!! link_to_action('TeamsController@show', 'details', $parameters = ['id' => $team->id], $attributes = []) !!}
                                             </td>
                                         </tr>
                                         <?php $background_color = ($background_color == $grey ? $blue: $grey); ?>
                                     @endforeach
                                 @else
                                     <tr style="background-color: {!! $background_color !!};">
-                                    <tr style="background-color: {!! $background_color !!};">
-                                        <td style="color: #c40000;font-weight: bold;" colspan="3"><p>No teams found</p></td>
+                                        <td style="color: #c40000;font-weight: bold;" colspan="4"><p>No teams found</p></td>
                                     </tr>
                                 @endif
                             </table>

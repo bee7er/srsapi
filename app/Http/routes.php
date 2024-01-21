@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Renders\RendersController;
 use App\Http\Controllers\Api\Renders\RegistrationsController;
 use App\Http\Controllers\Api\Renders\UploadsController;
+use App\Http\Controllers\Api\Renders\BlockedUsersController;
 use Illuminate\Http\Request;
 
 Route::get('/', 'HomeController@index');
@@ -26,6 +27,7 @@ Route::get('membership', 'TeamMembersController@membership');
 Route::get('toggleTeamStatus', 'TeamsController@toggleTeamStatus');
 Route::get('toggleMembershipStatus', 'TeamMembersController@toggleMembershipStatus');
 Route::get('toggleTeamMemberStatus', 'TeamMembersController@toggleTeamMemberStatus');
+Route::get('toggleBlockedUserStatus', 'TeamMembersController@toggleBlockedUserStatus');
 
 // Authentication, registering 2 controllers
 Route::controllers([
@@ -50,6 +52,13 @@ Route::post('/api1/register', function (Request $request) {
 Route::post('/api1/awake', function (Request $request) {
     return response()->json(
         (new RegistrationsController)->awake($request)
+    );
+});
+
+// Slave user notifying master that they are not currently rendering
+Route::get('/api1/available', function (Request $request) {
+    return response()->json(
+        (new RegistrationsController)->available($request)
     );
 });
 
@@ -106,6 +115,20 @@ Route::post('/projects', function (Request $request) {
 Route::post('/results', function (Request $request) {
     return response()->json(
         (new UploadsController)->handleUploadResults($request)
+    );
+});
+
+// Block a user from doing renders for the requesting user
+Route::post('/block', function (Request $request) {
+    return response()->json(
+        (new BlockedUserController)->block($request)
+    );
+});
+
+// Unblock a user to do renders for the requesting user
+Route::post('/unblock', function (Request $request) {
+    return response()->json(
+        (new BlockedUserController)->unblock($request)
     );
 });
 

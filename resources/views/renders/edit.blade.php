@@ -15,13 +15,8 @@
                             {!! Form::hidden('id', $render->id) !!}
 
                             <div class="form-group">
-                                {!! Form::label('first_name', 'First name', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('first_name', $render->first_name, ['class' => 'col-md-6']) !!}
-                            </div>
-
-                            <div class="form-group">
-                                {!! Form::label('surname', 'Surname', ['class' => 'col-md-4 control-label']) !!}
-                                {!! Form::text('surname', $render->surname, ['class' => 'col-md-6']) !!}
+                                {!! Form::label('userName', 'User name', ['class' => 'col-md-4 control-label']) !!}
+                                {!! Form::text('userName', $render->userName, ['class' => 'col-md-6']) !!}
                             </div>
 
                             <div class="form-group">

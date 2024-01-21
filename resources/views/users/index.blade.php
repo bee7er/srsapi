@@ -26,19 +26,19 @@
                                 @if (0 < count($users))
                                     @foreach ($users as $user)
                                         <tr style="background-color: {!! $background_color !!};">
-                                            <td class="">{{ $user->first_name }} {{ $user->surname  }}</td>
+                                            <td class="">{{ $user->userName  }}</td>
                                             <td class="{!! $user->status !!}">{!! $user->status !!}</td>
                                             <td style="text-align: center;">
-                                                {!! link_to_action('TeamMembersController@membership', 'Team Membership', $parameters = ['userId' => $user->id], $attributes = []) !!}
+                                                {!! link_to_action('TeamMembersController@membership', 'team membership', $parameters = ['userId' => $user->id], $attributes = []) !!}
                                                 -
-                                                {!! link_to_action('UsersController@show', 'Details', $parameters = ['id' => $user->id], $attributes = []) !!}
+                                                {!! link_to_action('UsersController@show', 'details', $parameters = ['id' => $user->id], $attributes = []) !!}
                                             </td>
                                         </tr>
                                         <?php $background_color = ($background_color == $grey ? $blue: $grey); ?>
                                     @endforeach
                                 @else
                                     <tr style="background-color: {!! $background_color !!};">
-                                        <td style="color: #c40000;font-weight: bold;" colspan="3"><p>No users found</p></td>
+                                        <td style="color: #c40000;font-weight: bold;font-size: 70%;" colspan="3"><p>No users found</p></td>
                                     </tr>
                                 @endif
                             </table>

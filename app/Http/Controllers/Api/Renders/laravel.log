@@ -1,8 +1,0 @@
-[2023-11-22 11:38:04] production.INFO: In handle upload projects: Array
-(
-    [email] => contact_bee@yahoo.com
-    [apiToken] => fl9ltqesXqPi4EkSj8M498ZBYYq3WOcCCZ1A9fDYQlbeNEmdzyyf2rGFpNR0gDGB7IswfX3pRSLuoDBF
-    [renderId] => 164
-)
-  
-[2023-11-22 11:38:04] production.INFO: error: Could not receive file  
