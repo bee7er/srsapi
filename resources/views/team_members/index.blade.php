@@ -14,7 +14,7 @@ use App\TeamMember;
                 <div class="col-md-8 col-md-offset-2">
                     <div class="panel panel-default">
                         <div class="panel-heading">List of Team Members</div>
-                        <div class="panel-heading">Team: <span  style="color: #428bca;font-weight: bold;">{!! $team->teamName !!}</span></div>
+                        <div class="panel-heading">Team: <span  style="color: #428bca;font-weight: bold;">{!! $team->teamName !!} ({!! $team->token !!})</span></div>
                         <div class="panel-heading">Status: <span  style="color: #428bca;font-weight: bold;">{!! $team->status !!}</span></div>
                         <div class="panel-body">
                             <div class="">{!! link_to_action('TeamMembersController@create', 'New Team Member', $parameters = ['id' => $teamId], $attributes = []) !!}</div>

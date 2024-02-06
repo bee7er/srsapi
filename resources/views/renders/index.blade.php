@@ -142,7 +142,7 @@
                                         @endforeach
                                     @else
                                         <tr style="background-color: {!! $color !!};">
-                                            <td colspan="9"><p>No renders found</p></td>
+                                            <td style="color: #c40000;font-weight: bold;font-size: 70%;" colspan="9"><p>No renders found</p></td>
                                         </tr>
                                     @endif
                                 </table>

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RenderDetail extends Model
 {
@@ -97,29 +98,39 @@ class RenderDetail extends Model
      * Returns submission and render details in an HTML string
      *
      * @param $submittedByUserId
+     * @param $teamId
      * @return string
      */
-    public static function getSubmissionsAndRendersAsHTML($submittedByUserId)
+    public static function getSubmissionsAndRendersAsHTML($submittedByUserId, $teamId)
     {
+        // Getting all submissions and renders regardless of which team they were in at the time
         list($submissions, $renders) = self::getSubmissionsAndRenders($submittedByUserId);
-        $availableUsers = User::getAvailableUsers();
+        // Get other team members for the given team
+        $teams = TeamMember::getTeamsAndMembers($submittedByUserId, $teamId);
+        if (is_null($teams) || !is_array($teams) || 0 >= count($teams)) {
+            throw new \Exception("Could not find any teams for user {$submittedByUserId} looking for team {$teamId}");
+        }
+
+        $team = reset($teams); // get first (only) element
         $html = '<table style="font-size:11px;width:100%;">';
-        $html .= '<tr><td colspan="3" style="font-size:16px;font-weight:bold;">Team Members Currently Available</td></tr>';
-        $html .= "<tr><th>User name</th><th>Email</th><th>Status</th></tr>";
+        $html .= '<tr><td colspan="3" style="font-size:16px;font-weight:bold;">Team Members</td></tr>';
+        $html .= "<tr><th>User name</th><th>Email</th><th>Status</th><th>Action</th></tr>";
         $entryCount = 0;
 
         $color = $grey = '#d8d8d8';
         $blue = '#a6ffff';
-        if (is_array($availableUsers) && 0 < count($availableUsers)) {
-            foreach ($availableUsers as $availableUser) {
+        if (is_array($team->otherTeamMembers) && 0 < count($team->otherTeamMembers)) {
+            foreach ($team->otherTeamMembers as $teamMember) {
                 $entryCount++;
-                // Highlight the user when they are available
-                if ($availableUser->id == $submittedByUserId) {
+                // Check if the available user is in fact blocked for this user/team
+
+                // Highlight the user when they are available and not blocked
+                if ($teamMember->userId == $submittedByUserId) {
                     $color = '#a851d6';
-                    $availableUser->userName = 'You';
+                    $teamMember->userName = 'You';
                 }
                 // Build a row with this information
-                $html .= "<tr style=\"background-color: {$color};\"><td>{$availableUser->userName}</td><td>{$availableUser->email}</td><td>{$availableUser->status}</td></tr>";
+                $html .= "<tr style=\"background-color: {$color};\"><td>{$teamMember->userName}</td><td>{$teamMember->userToken}</td><td>{$teamMember->status}</td><td>{$teamMember->blockedStatus}</td></tr>";
                 $color = ($color == $grey ? $blue: $grey);
             }
         } else {

@@ -27,7 +27,7 @@ cd Code/srsapi
             START TRANSACTION;
             SET time_zone = "+00:00";
 
-            <changes here>
+            ALTER TABLE `users` CHANGE `user_token` `user_token` VARCHAR(16) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL;
 
 # bash scripting
     ######## To invoke python !/usr/bin/env python3

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Renders;
+namespace App\Http\Controllers\Api;
 
 use App\BlockedUser;
 use App\Http\Controllers\Controller;

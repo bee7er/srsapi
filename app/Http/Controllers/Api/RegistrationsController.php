@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Renders;
+namespace App\Http\Controllers\Api;
 
 use App\BlockedUser;
 use App\Http\Controllers\Controller;
@@ -176,6 +176,7 @@ class RegistrationsController extends Controller
                         // If the available user is blocked, then check subsequent render details
                         if (BlockedUser::where(['userId'=>$result->submitted_by_user_id,'teamId'=>$team->id, 'blockedUserId'=>$user->id])->exists()) {
                             // Available user is blocked by the user who submitted the render request
+                            Log::info('Available user for email: ' . $request->get(self::EMAIL) . ' is blocked for submitting user id ' . $result->submitted_by_user_id);
                             continue;
                         }
 
@@ -363,7 +364,7 @@ class RegistrationsController extends Controller
                     // user then check for outstanding renders
                     if ($user->data_changed) {
                         // Get both submissions and renders as a displayable string
-                        $submissionsAndRenders = RenderDetail::getSubmissionsAndRendersAsHTML($user->id);
+                        $submissionsAndRenders = RenderDetail::getSubmissionsAndRendersAsHTML($user->id, $team->id);
 
                         $actionInstruction = self::AI_DO_DISPLAY_OUTSTANDING;
 

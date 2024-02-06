@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\Renders\RendersController;
-use App\Http\Controllers\Api\Renders\RegistrationsController;
-use App\Http\Controllers\Api\Renders\UploadsController;
-use App\Http\Controllers\Api\Renders\BlockedUsersController;
+use App\Http\Controllers\Api\RendersController;
+use App\Http\Controllers\Api\RegistrationsController;
+use App\Http\Controllers\Api\UploadsController;
+use App\Http\Controllers\Api\BlockedUsersController;
+use App\Http\Controllers\Api\TeamsController;
 use Illuminate\Http\Request;
 
 Route::get('/', 'HomeController@index');
@@ -104,6 +105,13 @@ Route::post('/api1/render', function (Request $request) {
     );
 });
 
+// Slave user requesting a render to be processed
+Route::post('/api1/new_team', function (Request $request) {
+    return response()->json(
+        (new TeamsController)->newTeam($request)
+    );
+});
+
 // Uploading project with assets files
 Route::post('/projects', function (Request $request) {
     return response()->json(
@@ -121,19 +129,17 @@ Route::post('/results', function (Request $request) {
 // Block a user from doing renders for the requesting user
 Route::post('/block', function (Request $request) {
     return response()->json(
-        (new BlockedUserController)->block($request)
+        (new BlockedUsersController)->block($request)
     );
 });
 
 // Unblock a user to do renders for the requesting user
 Route::post('/unblock', function (Request $request) {
     return response()->json(
-        (new BlockedUserController)->unblock($request)
+        (new BlockedUsersController)->unblock($request)
     );
 });
 
-
-//*******************
 // Returns a list of renders currently in the queue
 Route::get('/api1/renders', function () {
     return response()->json(
