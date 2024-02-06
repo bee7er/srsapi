@@ -75,7 +75,7 @@ class RegistrationsController extends Controller
                 // Ensure there is a directory here to contain uploaded projects and renders for this user
                 $directory = "uploads/{$request->get(self::USERTOKEN)}/projects";
                 if (!file_exists($directory)) {
-                    Log::info('**** In register making directory: ' . $directory);
+                    Log::info('In register making directory: ' . $directory);
                     // create the directory
                     mkdir($directory, 0755, true);
                 }
@@ -631,7 +631,7 @@ class RegistrationsController extends Controller
 
                 $fileNameFullPath = "uploads/{$user->user_token}/renders/{$request->get(self::RENDERID)}/{$request->get(self::FILENAME)}";
                 if (unlink($fileNameFullPath)) {
-                    //Log::info("*** File: {$fileNameFullPath} successfully deleted");
+                    //Log::info("File: {$fileNameFullPath} successfully deleted");
                 } else {
                     throw new \Exception("Could not delete file '{$fileNameFullPath}'");
                 }
@@ -659,7 +659,7 @@ class RegistrationsController extends Controller
     public function completionHousekeeping($renderId)
     {
         try {
-            //Log::info("*** Housekeeping for render id: {$renderId}");
+            //Log::info("Housekeeping for render id: {$renderId}");
             $results = DB::table('renders as r')
                 ->select(
                     'r.id as render_id','r.status as render_status','r.c4dProjectWithAssets','r.outputFormat',
@@ -683,7 +683,7 @@ class RegistrationsController extends Controller
                         throw new \Exception("Could not find render detail record with id '{$result->render_detail_id}'");
                     }
 
-                    //Log::info('*** Housekeeping render detail: ' . $result->render_detail_id);
+                    //Log::info('Housekeeping render detail: ' . $result->render_detail_id);
 
                     // Get all the images from the renders directory, so we can delete those for this render
                     $dir = "uploads/{$result->submittedByUserToken}/renders";
@@ -701,7 +701,7 @@ class RegistrationsController extends Controller
                         $fileName = $this->getArrayValue($images, sprintf("%04d", $i) . "." . $result->outputFormat);
                         if (null !== $fileName) {
                             if (unlink("uploads/{$result->submittedByUserToken}/renders/{$result->render_id}/{$fileName}")) {
-                                Log::info("*** File: {$fileName} successfully deleted");
+                                Log::info("File: {$fileName} successfully deleted");
                             } else {
                                 throw new \Exception("Could not delete file '{$fileName}'");
                             }

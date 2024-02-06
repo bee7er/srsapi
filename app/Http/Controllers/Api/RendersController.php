@@ -116,7 +116,7 @@ class RendersController extends Controller
         } catch(\Exception $exception) {
             $result = 'Error';
             $message = $exception->getMessage();
-            Log::info('Error: ' . $message);
+            Log::info('Error in render(): ' . $message);
         }
 
         $returnData = [
