@@ -57,7 +57,7 @@ class TeamMember extends Model
             ->select(
                 'tm.id as teamMemberId','tm.teamId','tm.userId','tm.status as teamMemberStatus',
                 't.id as teamId','t.status as teamStatus','t.teamName',
-                'u.id as userId','u.userName','u.email','u.user_token','u.status'
+                'u.id as userId','u.userName','u.email','u.user_token as userToken','u.status'
             )
             ->join('teams as t', 't.id', '=', 'tm.teamId')
             ->leftjoin('users as u', 'u.id', '=', 'tm.userId')
@@ -75,7 +75,7 @@ class TeamMember extends Model
         // Add other members for each team
         foreach ($teams as $team) {
             $builder = DB::table('team_members as tm')
-                ->select('tm.id as teamMemberId','tm.teamId','u.id as userId','u.userName')
+                ->select('tm.id as teamMemberId','tm.teamId','u.id as userId','u.userName','u.email','u.user_token as userToken','u.status')
                 ->leftjoin('users as u', 'u.id', '=', 'tm.userId')
                 ->where(['tm.teamId' => $team->teamId])
                 ->where('u.id','!=', $userId);

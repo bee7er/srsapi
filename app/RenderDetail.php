@@ -114,7 +114,7 @@ class RenderDetail extends Model
         $team = reset($teams); // get first (only) element
         $html = '<table style="font-size:11px;width:100%;">';
         $html .= '<tr><td colspan="3" style="font-size:16px;font-weight:bold;">Team Members</td></tr>';
-        $html .= "<tr><th>User name</th><th>Email</th><th>Status</th><th>Action</th></tr>";
+        $html .= "<tr><th>User name</th><th>User token</th><th>Status</th><th>Action</th></tr>";
         $entryCount = 0;
 
         $color = $grey = '#d8d8d8';
