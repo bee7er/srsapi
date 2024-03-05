@@ -105,10 +105,17 @@ Route::post('/api1/render', function (Request $request) {
     );
 });
 
-// Slave user requesting a render to be processed
+// Slave user requesting a new team to be created
 Route::post('/api1/new_team', function (Request $request) {
     return response()->json(
         (new TeamsController)->newTeam($request)
+    );
+});
+
+// Slave user requesting a new user to be created
+Route::post('/api1/new_user', function (Request $request) {
+    return response()->json(
+        (new RegistrationsController)->newUser($request)
     );
 });
 

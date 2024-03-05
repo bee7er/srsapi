@@ -10,11 +10,10 @@ use App\Team;
 use App\TeamMember;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
-use PhpSpec\Exception\Exception;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RegistrationsController extends Controller
 {
@@ -48,6 +47,56 @@ class RegistrationsController extends Controller
     const  AI_DO_DISPLAY_OUTSTANDING = 'outstanding';
 
     /**
+     * Create a new user
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function newUser(Request $request)
+    {
+        $message = "New user created OK";
+        $result = 'OK';
+        $newUserToken = '';
+        $newUserName = '';
+        $newUserEmail = '';
+        try {
+            Log::info('In new user');
+
+            $user = new User();
+            $user->status     = User::AVAILABLE;
+            $user->role       = User::USER;
+            $user->userName   = User::DEFAULTNAME;
+            $user->user_token = $user->getNewToken();
+            // This generated email s guaranteed to be unique.  User can change it later.
+            $user->email      = ($user->user_token . '@' . User::DOMAIN);
+            $user->password   = Hash::make(Input::get('password'));
+            $user->save();
+
+            $this->checkUserDirectories($user->user_token);
+
+            $newUserToken = $user->user_token;
+            $newUserName = $user->userName;
+            $newUserEmail = $user->email;
+
+        } catch(\Exception $exception)
+        {
+            $result = 'Error';
+            $message = "Error creating new user: " . $exception->getMessage();
+            Log::info('Exception: ' . $message);
+        }
+
+        $returnData = [
+            "userToken" => $newUserToken,
+            "userName" => $newUserName,
+            "email" => $newUserEmail,
+            "result" => $result,
+            "message" => $message,
+        ];
+
+        return $returnData;
+    }
+    
+    /**
      * Register a slave user in the team rendering system
      *
      * @param  \Illuminate\Http\Request  $request
@@ -72,18 +121,7 @@ class RegistrationsController extends Controller
                 }
                 TeamMember::checkTeamMembership($user->id, $team->id);
 
-                // Ensure there is a directory here to contain uploaded projects and renders for this user
-                $directory = "uploads/{$request->get(self::USERTOKEN)}/projects";
-                if (!file_exists($directory)) {
-                    Log::info('In register making directory: ' . $directory);
-                    // create the directory
-                    mkdir($directory, 0755, true);
-                }
-                $directory = "uploads/{$request->get(self::USERTOKEN)}/renders";
-                if (!file_exists($directory)) {
-                    // create the directory
-                    mkdir($directory, 0755, true);
-                }
+                $this->checkUserDirectories($request->get(self::USERTOKEN));
 
                 // Update user with availability
                 $user->status = ($request->get(self::AVAILABILITY) == self::AVAILABILITY_AVAILABLE ? 'available': 'unavailable');
@@ -113,6 +151,26 @@ class RegistrationsController extends Controller
         ];
 
         return $returnData;
+    }
+
+    /**
+     * Checks that directories needed later exist
+     *
+     * @param $userToken
+     */
+    private function checkUserDirectories($userToken)
+    {
+        // Ensure there is a directory here to contain uploaded projects and renders for this user
+        $directory = "uploads/{$userToken}/projects";
+        if (!file_exists($directory)) {
+            Log::info('In register making directory: ' . $directory);
+            mkdir($directory, 0755, true);
+        }
+        $directory = "uploads/{$userToken}/renders";
+        if (!file_exists($directory)) {
+            Log::info('In register making directory: ' . $directory);
+            mkdir($directory, 0755, true);
+        }
     }
 
     /**

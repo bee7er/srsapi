@@ -107,6 +107,9 @@ class UploadsController extends Controller
                         Log::info("Uploaded file seems to be there");
 
                         $saveToDir = "uploads/{$user->user_token}/projects/{$request->get(self::RENDERID)}";
+
+                        Log::info("Saving to dir: " . $saveToDir);
+
                         if (!is_dir($saveToDir) && !mkdir($saveToDir)){
                             Log::info("Could not make directory: {$saveToDir}");
 

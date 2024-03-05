@@ -96,7 +96,7 @@ class UsersController extends Controller
             $user->userName   = Input::get('userName');
             $user->user_token = $user->getNewToken();
             // This generated email s guaranteed to be unique.  User can change it later.
-            $user->email      = ($user->user_token . '@' . User::DOMIAN);
+            $user->email      = ($user->user_token . '@' . User::DOMAIN);
             $user->password   = Hash::make(Input::get('password'));
             $user->save();
 

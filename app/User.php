@@ -19,7 +19,7 @@ class User extends Model implements AuthenticatableContract,
 {
     use Authenticatable, Authorizable, CanResetPassword;
 
-    const DOMIAN = 'powerhouse.industries';
+    const DOMAIN = 'powerhouse.industries';
 
     const ADMIN = 'admin';
     const USER = 'user';
@@ -28,6 +28,8 @@ class User extends Model implements AuthenticatableContract,
     const AVAILABLE = 'available';
     const RENDERING = 'rendering';
     const UNAVAILABLE = 'unavailable';
+
+    const DEFAULTNAME = 'New user';
 
     /**
      * The database table used by the model.
