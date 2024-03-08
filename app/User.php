@@ -29,7 +29,7 @@ class User extends Model implements AuthenticatableContract,
     const RENDERING = 'rendering';
     const UNAVAILABLE = 'unavailable';
 
-    const DEFAULTNAME = 'New user';
+    const DEFAULTUSERNAME = '[Default user name]';
 
     /**
      * The database table used by the model.

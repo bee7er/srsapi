@@ -8,6 +8,8 @@ Run: vagrant ssh # to access the running environment and MySQL
 
 cd Code/srsapi
 
+# After deploying to the server.  If bootstrap is deployed aswell then the cache must be removed
+# because it has the db details of localhost here.
 
 # db
     create database srs;

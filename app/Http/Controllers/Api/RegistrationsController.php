@@ -65,7 +65,7 @@ class RegistrationsController extends Controller
             $user = new User();
             $user->status     = User::AVAILABLE;
             $user->role       = User::USER;
-            $user->userName   = User::DEFAULTNAME;
+            $user->userName   = User::DEFAULTUSERNAME;
             $user->user_token = $user->getNewToken();
             // This generated email s guaranteed to be unique.  User can change it later.
             $user->email      = ($user->user_token . '@' . User::DOMAIN);
